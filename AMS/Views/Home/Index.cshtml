@@ -1,0 +1,46 @@
+﻿@model AMS.Models.User
+
+@{
+	ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid full-height" >
+	<div class="row h-100">
+		<!-- Left side image -->
+		<div class="col-md-7 login-image d-none d-md-block"></div>
+
+		<!-- Right side form -->
+		<div class="col-md-5 bg-color form-container">
+			<div class="form-box">
+				<h3 class="text-center mb-4 text-primary">Login</h3>
+				@if (TempData["Error"] != null)
+				{
+					<p style="color: red">@TempData["Error"]</p>
+				}
+				<form asp-area="Admin" asp-controller="Dashboard" asp-action="Login" method="post">
+					<div class="mb-3">
+						<label asp-for="Role" class="form-label">Role</label>
+						<select class="form-select" asp-for="Role" required>
+							<option value="">-- Select Role --</option>
+							<option value="Admin">Admin</option>
+							<option value="Hr">HR</option>
+							<option value="Employee">Employee</option>
+						</select>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Username" class="form-label">Email address</label>
+						<input type="text" class="form-control" asp-for="Username" placeholder="Enter Username" required>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="PasswordHash" class="form-label">Password</label>
+						<input type="password" class="form-control" asp-for="PasswordHash" placeholder="Enter password" required>
+					</div>
+
+					<button type="submit" class="btn btn-primary w-100">Login</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,12 @@
+﻿@model Employees
+
+<h1>Delete Product</h1>
+
+<h4>Are you sure you want to delete this employee "@Model.FirstName"</h4>
+
+<form asp-controller="Dashboard" asp-action="DeleteConfirm" method="post">
+	<input asp-for="EmployeeId" hidden />
+	<button type="submit" class="btn btn-danger">Delete</button>
+</form>
+
+<a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary mt-3">Back To Lsit</a>

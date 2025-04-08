@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Employees>
+@{
+	ViewData["Title"] = "Employee Management";
+}
+<div class="container py-4">
+
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h2 class="fw-bold">👨‍💼 Employee Management</h2>
+		<a class="btn btn-success shadow-sm px-4" asp-controller="Dashboard" asp-action="Create">
+			➕ Add Employee
+		</a>
+	</div>
+
+	<div class="card shadow-sm rounded-4 border-0">
+		<div class="card-body p-4">
+			<div class="table-responsive">
+				<table class="table table-hover align-middle">
+					<thead class="table-light">
+						<tr>
+							<th>#</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Email</th>
+							<th>Phone</th>
+							<th>Department</th>
+							<th>Designation</th>
+							<th>Joining Date</th>
+							<th>Status</th>
+							<th class="text-center">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						@{
+							int count = 1;
+							foreach (var employee in Model)
+							{
+								<tr>
+									<td>@count</td>
+									<td>@employee.FirstName</td>
+									<td>@employee.LastName</td>
+									<td>@employee.Email</td>
+									<td>@employee.PhoneNumber</td>
+									<td>@employee.Department</td>
+									<td>@employee.Designation</td>
+									<td>@employee.JoiningDate.ToString("dd MMM yyyy")</td>
+									<td>
+										@if (employee.Status == "active" || employee.Status == "Active")
+										{
+											<span class="badge bg-success">Active</span>
+										}
+										else
+										{
+											<span class="badge bg-secondary">Inactive</span>
+										}
+									</td>
+									<td class="text-center">
+										<a class="btn btn-sm btn-outline-primary me-1" title="Edit"
+										   asp-controller="Dashboard" asp-action="Edit" asp-route-id="@employee.EmployeeId">
+											✏️ Edit
+										</a>
+										<a class="btn btn-sm btn-outline-danger" title="Delete"
+										   asp-controller="Dashboard" asp-action="Delete" asp-route-id="@employee.EmployeeId">
+											🗑️ Delete
+										</a>
+									</td>
+								</tr>
+								count++;
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+			<a class="btn btn-info shadow-sm px-4" asp-area="" asp-controller="Attendance" asp-action="Index">
+				📋 View Attendance
+			</a>
+
+		</div>
+	</div>
+
+</div>

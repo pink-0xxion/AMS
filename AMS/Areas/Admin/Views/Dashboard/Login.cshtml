@@ -1,0 +1,51 @@
+﻿@model AMS.Models.Admin
+
+@{
+	ViewData["Title"] = "Login";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutLogin.cshtml";
+}
+
+
+	
+<div class="container d-flex justify-content-center align-items-center vh-100">
+	<div class="col-md-5">
+		<div class="card shadow-lg border-0 rounded-4">
+			<div class="card-header bg-primary text-white text-center rounded-top-4">
+				<h4 class="my-2">Admin Login</h4>
+			</div>
+			<div class="card-body p-4">
+				@if (ViewBag.Message != null)
+				{
+					<p style="color: red">@ViewBag.Message</p>
+				}
+				<form asp-action="Login">
+					<div class="mb-3">
+						<label asp-for="Email" class="form-label">Email</label>
+						<input asp-for="Email" class="form-control" placeholder="Enter email" />
+						<span asp-validation-for="Email" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+						<label asp-for="Password" class="form-label">Password</label>
+						<input asp-for="Password" class="form-control" type="password" placeholder="Enter password" />
+						<span asp-validation-for="Password" class="text-danger"></span>
+					</div>
+					<div class="d-grid">
+						<button type="submit" class="btn btn-primary">Login</button>
+					</div>
+				</form>
+			</div>
+			<div class="card-footer text-center text-muted small">
+				&copy; 2025 Admin Panel
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
