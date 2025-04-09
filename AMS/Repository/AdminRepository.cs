@@ -67,7 +67,12 @@ namespace AMS.Repository
         {
             return _employeeAttendance.GetAttendanceByMonthYearAsync(employee, month, year);
         }
-
        
+
+        Task<IEnumerable<Attendance>> IAdminRepository.GetAttendanceByIdAsync(string idColumn, int id)
+        {
+            return _employeeAttendance.GetAttendanceByIdAsync(idColumn, id);
+        }
+
     }
 }

@@ -118,5 +118,14 @@ namespace CRM.Data
                 Year = year
             });
         }
+
+        // Get Attendance By Id
+        public async Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id)
+        {
+            var query = $"SELECT * FROM {_tableName} WHERE {idColumn} = @Id";
+            using var connection = _context.CreateConnection();
+            return await connection.QueryAsync<T>(query, new { Id = id });
+        }
+
     }
 }

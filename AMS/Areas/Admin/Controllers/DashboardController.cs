@@ -2,6 +2,7 @@
 using System.Text.Json;
 using AMS.Interfaces;
 using AMS.Models;
+using AMS.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AMS.Areas.Admin.Controllers
@@ -305,6 +306,29 @@ namespace AMS.Areas.Admin.Controllers
 
             }
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> EmployeeDetails(int id)
+        {
+            var email = HttpContext.Session.GetString("UserSession");
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Index", "Home", new { area = "" });
+            }
+
+            string idColumn = "EmployeeId";
+
+            var employee = await _adminRepository.GetByIdAsync(idColumn, id);
+            var attendence = await _adminRepository.GetAttendanceByIdAsync(idColumn, id);
+
+            var viewModel = new EmployeeDetailsViewModel
+            {
+                Employee = employee,
+                AttendanceRecord = attendence.ToList()
+            };
+
+            return View(viewModel);
         }
 
         public IActionResult Logout()
