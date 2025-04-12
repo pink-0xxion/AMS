@@ -1,8 +1,12 @@
 ﻿
+using AMS.Helpers;
 using AMS.Interfaces;
 using AMS.Models;
 using AMS.Repository;
+using AMS.Services;
 using CRM.Data;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 public static class ServiceConfiguration
 {
@@ -11,6 +15,14 @@ public static class ServiceConfiguration
 
         // SERVICES
         services.AddSession();
+
+        // DinkToPdf
+        //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+        services.AddSingleton<IConverter>(provider => new SynchronizedConverter(new PdfTools()));
+        services.AddScoped<PdfService>();
+
+        services.AddScoped<IViewRenderService, ViewRenderService>();
+
 
         // DATA
         services.AddSingleton<DapperContext>();

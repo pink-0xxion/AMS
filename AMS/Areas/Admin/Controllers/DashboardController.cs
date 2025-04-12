@@ -3,7 +3,12 @@ using System.Text.Json;
 using AMS.Interfaces;
 using AMS.Models;
 using AMS.Models.ViewModel;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 using Microsoft.AspNetCore.Mvc;
+using AMS.Services;
+using AMS.Helpers;
+using QuestPDF.Fluent;
 
 namespace AMS.Areas.Admin.Controllers
 {
@@ -11,10 +16,15 @@ namespace AMS.Areas.Admin.Controllers
     public class DashboardController : Controller
     {
         private readonly IAdminRepository _adminRepository;
+        private readonly PdfService _pdfService;
+        private readonly IViewRenderService _viewRenderService;
 
-        public DashboardController(IAdminRepository adminRepository)
+
+        public DashboardController(IAdminRepository adminRepository, PdfService pdfservice, IViewRenderService viewRenderService)
         {
             _adminRepository = adminRepository;
+            _pdfService = pdfservice;
+            _viewRenderService = viewRenderService;
         }
 
 
@@ -329,6 +339,63 @@ namespace AMS.Areas.Admin.Controllers
             };
 
             return View(viewModel);
+        }
+
+        //  Download Pdf
+        public async Task<IActionResult> DownloadPdf(int id)
+        {
+            /*  //string pageUrl = Url.Action("EmployeeDetails", "Dashboard", new { id = id }, Request.Scheme, Request.Host.Value);
+
+              //string pageUrl = Url.Action(
+              //    action: "EmployeeDetails",
+              //    controller: "Dashboard",
+              //    values: new { area = "Admin", id = id },
+              //    protocol: Request.Scheme,
+              //    host: Request.Host.Value
+              //);
+
+              //string pageUrl = "https://localhost:7067/Admin/Dashboard/EmployeeDetails/" + id; // Authentication cookie required
+              string pageUrl = "https://mdbootstrap.com/docs/standard/extended/bootstrap4-table-scroll/";
+
+              var pdfBytes = _pdfService.GeneratePdf(pageUrl);
+              return File(pdfBytes, "application/pdf", "EmployeeDetails.pdf"); // To download the PDF File
+            */
+
+            string idColumn = "EmployeeId";
+
+            var employee = await _adminRepository.GetByIdAsync(idColumn, id);
+            var attendance = await _adminRepository.GetAttendanceByIdAsync(idColumn, id);
+
+            var model = new EmployeeDetailsViewModel
+            {
+                Employee = employee,
+                AttendanceRecord = attendance.ToList()
+            };
+
+            var htmlContent = await _viewRenderService.RenderViewAsync(this.ControllerContext, "EmployeeDetails", model);
+
+            var pdfBytes = _pdfService.GeneratePdfFromHtml(htmlContent);
+
+            return File(pdfBytes, "application/pdf", "EmployeeDetails.pdf");
+        }
+
+        public async Task<IActionResult> DownloadQuestPdf(int id)
+        {
+            string idColumn = "EmployeeId";
+
+            var employee = await _adminRepository.GetByIdAsync(idColumn, id);
+            var attendance = await _adminRepository.GetAttendanceByIdAsync(idColumn, id);
+
+            var model = new EmployeeDetailsViewModel
+            {
+                Employee = employee,
+                AttendanceRecord = attendance.ToList()
+            };
+
+            var document = new EmployeeDetailsDocument(model);
+            var pdfBytes = document.GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", "EmployeeDetails_QuestPDF.pdf");
         }
 
         public IActionResult Logout()
