@@ -2,7 +2,7 @@
 using AMS.Models;
 using AMS.Models.ViewModel;
 using AMS.Repository;
-using CRM.Data;
+using AMS.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;

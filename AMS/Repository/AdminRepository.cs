@@ -1,6 +1,6 @@
 ﻿using AMS.Interfaces;
 using AMS.Models;
-using CRM.Data;
+using AMS.Data;
 using NuGet.Protocol.Core.Types;
 using static Dapper.SqlMapper;
 

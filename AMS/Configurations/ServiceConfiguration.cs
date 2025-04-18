@@ -4,7 +4,7 @@ using AMS.Interfaces;
 using AMS.Models;
 using AMS.Repository;
 using AMS.Services;
-using CRM.Data;
+using AMS.Data;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 
@@ -31,7 +31,7 @@ public static class ServiceConfiguration
 
         // REPOSITORIES
         services.AddScoped<IAdminRepository, AdminRepository>();
-
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
         return services;
     }

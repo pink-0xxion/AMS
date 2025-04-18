@@ -3,7 +3,7 @@ using System.Data.SqlClient; // 👈 For SQL Server
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
 
-namespace CRM.Data
+namespace AMS.Data
 {
     public class DapperContext
     {
@@ -16,6 +16,8 @@ namespace CRM.Data
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public IDbConnection CreateConnection() => new SqlConnection(_connectionString); // 👈 SQL Server connection
+        //public IDbConnection CreateConnection() => new SqlConnection(_connectionString); // 👈 SQL Server connection
+
+        public SqlConnection CreateConnection() => new SqlConnection(_connectionString);
     }
 }

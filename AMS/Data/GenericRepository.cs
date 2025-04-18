@@ -2,8 +2,10 @@
 using System.Data;
 using System.Text;
 using System.Reflection;
+using AMS.Models;
 
-namespace CRM.Data
+namespace AMS.Data
+
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
@@ -126,7 +128,201 @@ namespace CRM.Data
             using var connection = _context.CreateConnection();
             return await connection.QueryAsync<T>(query, new { Value = value });
         }
-       
+
+
+
+
+        public async Task<Attendance?> GetAttendanceByEmployeeDateAsync(int employeeId, DateTime date)
+        {
+            using var connection = _context.CreateConnection();
+            await connection.OpenAsync(); // Ensure the connection is open
+
+            //var query = "SELECT * FROM Attendance WHERE EmployeeID = @EmployeeID AND AttendanceDate = @AttendanceDate";
+            var query = "SELECT * FROM Attendance WHERE EmployeeID = @EmployeeID AND CONVERT(DATE, AttendanceDate) = @AttendanceDate";
+
+
+            Console.WriteLine($"Executing Query: {query}");
+            Console.WriteLine($"Params: EmployeeID = {employeeId}, AttendanceDate = {date:yyyy-MM-dd}");
+
+            //return await connection.QuerySingleOrDefaultAsync<Attendance>(query, new { EmployeeID = employeeId, AttendanceDate = date.Date });
+            return await connection.QueryFirstOrDefaultAsync<Attendance>(query, new { EmployeeID = employeeId, AttendanceDate = date.Date });
+
+        }
+
+        public async Task UpdateAttendanceAsync(Attendance attendance)
+        {
+            // Console.WriteLine("UpdateAttendanceAsync called");
+
+
+            using var connection = _context.CreateConnection();
+            await connection.OpenAsync(); // 👈 Ensure the connection is open
+
+            var query = "UPDATE Attendance SET CheckOutTime = @CheckOutTime WHERE EmployeeID = @EmployeeID AND AttendanceDate = @AttendanceDate";
+            await connection.ExecuteAsync(query, new { attendance.CheckOutTime, attendance.EmployeeId, attendance.AttendanceDate });
+        }
+
+
+        //DATA FETCH FROM USER
+
+        public async Task<EmployeeAttendanceDto?> GetEmployeeAttendanceByDateAsync(int employeeId)
+        {
+            using var connection = _context.CreateConnection();
+
+            string query = @"
+                SELECT 
+                    e.FirstName, 
+                    e.LastName, 
+                    e.Department, 
+                    e.Designation,
+                    COALESCE(CONVERT(VARCHAR, a.CheckInTime, 108), 'Not Available') AS CheckInTime, 
+                    COALESCE(CONVERT(VARCHAR, a.CheckOutTime, 108), 'Not Available') AS CheckOutTime, 
+                    COALESCE(a.Status, 'Not Available') AS Status, 
+                    COALESCE(a.Remarks, 'Not Available') AS Remarks
+                FROM Employees e
+                LEFT JOIN Attendance a 
+                    ON e.EmployeeId = a.EmployeeId 
+                    AND CAST(a.AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)
+                WHERE e.EmployeeId = @EmployeeId;";
+
+
+
+            return await connection.QueryFirstOrDefaultAsync<EmployeeAttendanceDto>(query, new { EmployeeId = employeeId });
+        }
+
+
+
+
+
+
+        public async Task<bool> CheckInAsync(int employeeId, string remarks)
+        {
+            var sql = @"
+        IF EXISTS (SELECT 1 FROM Attendance WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE))
+        BEGIN
+            UPDATE Attendance 
+            SET CheckInTime = @CheckInTime, Status = 'Present', Remarks = @Remarks
+            WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE);
+        END
+        ELSE
+        BEGIN
+            INSERT INTO Attendance (EmployeeId, AttendanceDate, CheckInTime, Status, Remarks)
+            VALUES (@EmployeeId, GETDATE(), @CheckInTime, 'Present', @Remarks);
+        END";
+
+            var parameters = new
+            {
+                EmployeeId = employeeId,
+                CheckInTime = DateTime.Now.TimeOfDay, // Store only time part
+                Remarks = remarks
+            };
+
+            using var connection = _context.CreateConnection(); // ✅ Open connection
+            var result = await connection.ExecuteAsync(sql, parameters); // ✅ Use the connection
+            return result > 0;
+        }
+
+
+
+
+
+
+        public async Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime)
+
+        {
+            using var connection = _context.CreateConnection();
+            await connection.OpenAsync();
+
+            var query = @"
+        INSERT INTO AttendanceLogs (AttendanceID, CheckInTime, CheckOutTime, LogDateTime)
+        VALUES (@AttendanceID, @CheckInTime, @CheckOutTime, GETDATE())";
+
+            await connection.ExecuteAsync(query, new
+            {
+                AttendanceID = attendanceId,
+                CheckInTime = checkInTime,
+                CheckOutTime = checkOutTime
+            });
+        }
+
+
+
+
+        // Get Attendance By Id
+        public async Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id)
+        {
+            var query = $"SELECT * FROM {_tableName} WHERE {idColumn} = @Id";
+            using var connection = _context.CreateConnection();
+            return await connection.QueryAsync<T>(query, new { Id = id });
+        }
+
+
+
+
+        public async Task<IEnumerable<AttendanceLogDto>> GetAttendanceLogsAsync(int employeeId, int year, int month, int day)
+        {
+            using var connection = _context.CreateConnection();
+
+            DateTime targetDate;
+            try
+            {
+                targetDate = new DateTime(year, month, day);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return Enumerable.Empty<AttendanceLogDto>();
+            }
+
+
+            string query = @"
+SELECT 
+    COALESCE(CONVERT(VARCHAR, al.LogDateTime, 120), 'Not Available') AS LogDateTime,
+    COALESCE(CONVERT(VARCHAR, al.CheckInTime, 108), 'Not Available') AS CheckInTime, 
+    COALESCE(CONVERT(VARCHAR, al.CheckOutTime, 108), 'Not Available') AS CheckOutTime
+FROM AttendanceLogs al
+INNER JOIN Attendance a ON a.AttendanceID = al.AttendanceID
+WHERE a.EmployeeID = @EmployeeID AND CAST(al.LogDateTime AS DATE) = @TargetDate
+ORDER BY al.LogDateTime DESC;";
+
+
+            return await connection.QueryAsync<AttendanceLogDto>(query, new
+            {
+                EmployeeID = employeeId,
+                TargetDate = targetDate.Date
+            });
+        }
+
+
+        public async Task<IEnumerable<EmpAttendanceDto>> GetAttendanceByMonthYearAsyncById(int employeeId, int month, int year)
+        {
+            Console.WriteLine("Generic Repository");
+
+            using var connection = _context.CreateConnection();
+
+            string query = @"
+        SELECT 
+            e.EmployeeId,
+            (e.FirstName + ' ' + e.LastName) AS EmployeeName,
+            a.AttendanceDate,
+            a.Status
+        FROM Attendance a
+        INNER JOIN Employees e ON a.EmployeeId = e.EmployeeId
+        WHERE MONTH(a.AttendanceDate) = @Month
+          AND YEAR(a.AttendanceDate) = @Year
+          AND a.EmployeeId = @EmployeeId
+        ORDER BY a.AttendanceDate";
+
+            var result = await connection.QueryAsync<EmpAttendanceDto>(query, new
+            {
+                EmployeeId = employeeId,
+                Month = month,
+                Year = year
+            });
+
+            return result;
+        }
+
+
+
 
     }
 }
