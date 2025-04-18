@@ -1,0 +1,42 @@
+﻿@model IEnumerable<AMS.Models.AttendanceLogDto>
+
+@if (Model.Any())
+{
+    foreach (var log in Model)
+    {
+        <tr>
+            <td>@log.LogDateTime.ToString("g")</td>
+            <td>@log.CheckInTime</td>
+            <td>@log.CheckOutTime</td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="3" class="text-center text-muted">No attendance logs found for the selected date.</td>
+    </tr>
+}
+
+
+
+@* @model IEnumerable<AMS.Models.AttendanceLogDto>
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="3" class="text-center">No logs found for selected date.</td>
+    </tr>
+}
+else
+{
+    foreach (var log in Model)
+    {
+        <tr>
+            <td>@log.LogDateTime.ToString("g")</td>
+            <td>@log.CheckInTime </td>
+            <td>@log.CheckOutTime</td>
+        </tr>
+    }
+}
+ *@

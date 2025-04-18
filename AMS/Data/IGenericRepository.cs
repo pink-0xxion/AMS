@@ -1,6 +1,7 @@
 ﻿using AMS.Models;
 
-namespace CRM.Data
+namespace AMS.Data
+
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -21,6 +22,43 @@ namespace CRM.Data
 
         // Get Attendance By Id or Date
         Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, object value);
+
+
+
+        Task<bool> CheckInAsync(int employeeId, string remarks);
+
+
+        //not in use 
+        //Task<int> AddAttendanceAsync(Attendance attendance);
+        // till here
+
+        Task<Attendance?> GetAttendanceByEmployeeDateAsync(int employeeId, DateTime date);
+
+        Task UpdateAttendanceAsync(Attendance attendance);
+
+
+        //DATA FETCH FROM USER
+
+
+        Task<EmployeeAttendanceDto?> GetEmployeeAttendanceByDateAsync(int employeeId);
+
+
+
+        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime);
+
+
+
+
+
+        // Get Attendance By Id
+        Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id);
+
+
+        Task<IEnumerable<AttendanceLogDto>> GetAttendanceLogsAsync(int employeeId, int year, int month, int day);
+
+        Task<IEnumerable<EmpAttendanceDto>> GetAttendanceByMonthYearAsyncById(int employeeId, int month, int year);
+
+
 
     }
 }
