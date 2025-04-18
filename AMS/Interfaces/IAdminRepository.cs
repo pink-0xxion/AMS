@@ -20,8 +20,8 @@ namespace AMS.Interfaces
         // Fetch Employee Attendance
         Task<IEnumerable<dynamic>> GetAttendanceByMonthYearAsync(int employee, int month, int year);
 
-        // Get Attendance By Id
-        Task<IEnumerable<Attendance>> GetAttendanceByIdAsync(string idColumn, int id);
+        // Get Attendance By Id or Date
+        Task<IEnumerable<Attendance>> GetAttendanceByIdAsync(string idColumn, object value);
 
     }
 }

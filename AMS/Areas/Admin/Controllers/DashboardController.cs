@@ -104,11 +104,11 @@ namespace AMS.Areas.Admin.Controllers
                 {
                     HttpContext.Session.SetString("UserSession", myAdmin.Username);
                     //HttpContext.Session.SetString("UserImage", myAdmin.Image ?? "default-profile.jpg");
-                    return RedirectToAction("Index", "Dashboard");
+                    return RedirectToAction("Index", "Attendance", new { area = ""});
                 }
                 else if (myAdmin.Role == "Employee" || myAdmin.Role == "employee")
                 {
-                    HttpContext.Session.SetString("EmployeeSession", myAdmin.Username);
+                    HttpContext.Session.SetInt32("EmployeeId", myAdmin.EmployeeId.Value);
                     //HttpContext.Session.SetString("UserImage", myAdmin.Image ?? "default-profile.jpg");
                     return RedirectToAction("Index", "Employee", new { area = "Employee" });
                 }
@@ -409,6 +409,14 @@ namespace AMS.Areas.Admin.Controllers
                 return RedirectToAction("Index", "Home", new { area = "" });
             }
             return RedirectToAction("Index", "Home", new { area = "" });
+        }
+
+
+
+        public IActionResult Test()
+        {
+            Console.WriteLine("Test Called");
+            return View();
         }
 
     }

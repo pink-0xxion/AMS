@@ -115,6 +115,7 @@ function fetchAttendance() {
 
             if (!data || data.length === 0) {
                 tableContainer.hide();               // hide table
+                instructions.addClass("d-none");
                 messageContainer.text("No attendance data found. Please check the employee name, month, or year.").show();
                 return;
             }

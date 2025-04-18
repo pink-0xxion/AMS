@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - AMS</title>
+	<!--FOUC solution-->
+	<script>
+		(function () {
+			try {
+				var savedTheme = localStorage.getItem("themeClass");
+				if (savedTheme) {
+					document.documentElement.className = savedTheme;
+				}
+			} catch (e) {
+				console.error("Theme loading error", e);
+			}
+		})();
+	</script>
+
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/AMS.styles.css" asp-append-version="true" />
+	@* <link rel="stylesheet" href="~/css/Style.css" asp-append-version="true" /> *@
+
+	<!--Start Tempalte links-->
+	<!--favicon-->
+	<link rel="icon" href="~/assets/images/favicon-32x32.png" type="image/png" />
+	<!--plugins-->
+	<link href="~/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet" />
+	<link href="~/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+	<link href="~/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+	<link href="~/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+	<!-- loader-->
+	@* <link href="~/assets/css/pace.min.css" rel="stylesheet" />
+	<script src="~/assets/js/pace.min.js"></script> *@
+	<!-- Bootstrap CSS -->
+	<link href="~/assets/css/bootstrap.min.css" rel="stylesheet">
+	<link href="~/assets/css/bootstrap-extended.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+	<link href="~/assets/css/app.css" rel="stylesheet">
+	<link href="~/assets/css/icons.css" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="~/assets/css/dark-theme.css" />
+	<link rel="stylesheet" href="~/assets/css/semi-dark.css" />
+	<link rel="stylesheet" href="~/assets/css/header-colors.css" />
+	<title>AMS</title>
+	<!--End Tempalte links-->
+</head>
+<body>
+
+
+	@* <div class="wrapper"> *@
+
+	@* <div class="container-fluid"> *@
+	<div class="wrapper">
+		<div class="row">
+			<!-- Sidebar (fixed width) -->
+			<div class="col-md-1 p-0 bg-light vh-100 d-none d-md-block">
+				<!-- position-fixed-->
+				<partial name="~/Areas/Admin/Views/Shared/_Sidebar.cshtml" />
+
+			</div>
+
+			<!-- Main Content -->
+			<div class="col-md-10 p-0">
+				<!-- Header -->
+				<partial name="~/Areas/Admin/Views/Shared/_Header.cshtml" />
+
+				<!-- Body Content -->
+				<main class="pb-3 p-3 mt-5 ms-5" role="main">
+					<div class="container mt-3 ml-3">
+						@RenderBody()
+					</div>
+				</main>
+
+				<!-- Switcher and Footer -->
+				<partial name="~/Areas/Admin/Views/Shared/_Switcher.cshtml" />
+				<partial name="~/Areas/Admin/Views/Shared/_Footer.cshtml" />
+			</div>
+		</div>
+	</div>
+
+
+	@* </div> *@
+
+
+
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!--Start Template Script -->
+	<!-- Bootstrap JS -->
+	@* <script src="~/assets/js/bootstrap.bundle.min.js"></script> *@
+	<!--plugins-->
+	<script src="~/assets/js/jquery.min.js"></script>
+	<script src="~/assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="~/assets/plugins/metismenu/js/metisMenu.min.js"></script>
+	<script src="~/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+	<script src="~/assets/plugins/chartjs/chart.min.js"></script>
+	<script src="~/assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
+	<script src="~/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
+	<script src="~/assets/plugins/jquery.easy-pie-chart/jquery.easypiechart.min.js"></script>
+	<script src="~/assets/plugins/sparkline-charts/jquery.sparkline.min.js"></script>
+	<script src="~/assets/plugins/jquery-knob/excanvas.js"></script>
+	<script src="~/assets/plugins/jquery-knob/jquery.knob.js"></script>
+	<script>
+		$(function() {
+			$(".knob").knob();
+		});
+	</script>
+	<script src="~/assets/js/index.js"></script>
+	<!--app JS-->
+	<script src="~/assets/js/app.js"></script>
+
+	<!--End Template Script -->
+	@await RenderSectionAsync("Scripts", required: false)
+
+	<!-- Notification Alert -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		@if (TempData["Notification"] != null)
+		{
+			<text>
+				Swal.fire({
+					icon: '@TempData["NotificationType"]',
+					title: '@TempData["Notification"]'
+				});
+			</text>
+		}
+		});
+	</script>
+</body>
+</html>

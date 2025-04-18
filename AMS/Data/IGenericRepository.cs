@@ -19,7 +19,8 @@ namespace CRM.Data
         // ✅ New method: Get attendance records optionally filtered by employee
         Task<IEnumerable<dynamic>> GetAttendanceByMonthYearAsync(int employee, int month, int year);
 
-        // Get Attendance By Id
-        Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id);
+        // Get Attendance By Id or Date
+        Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, object value);
+
     }
 }

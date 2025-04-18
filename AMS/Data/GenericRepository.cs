@@ -119,13 +119,14 @@ namespace CRM.Data
             });
         }
 
-        // Get Attendance By Id
-        public async Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id)
+        // Get Attendance By Id or Date // unnecessary, you have used GetByIdAsync instead
+        public async Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, object value)
         {
-            var query = $"SELECT * FROM {_tableName} WHERE {idColumn} = @Id";
+            var query = $"SELECT * FROM {_tableName} WHERE {idColumn} = @Value";
             using var connection = _context.CreateConnection();
-            return await connection.QueryAsync<T>(query, new { Id = id });
+            return await connection.QueryAsync<T>(query, new { Value = value });
         }
+       
 
     }
 }

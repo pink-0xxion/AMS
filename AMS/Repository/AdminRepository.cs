@@ -69,9 +69,10 @@ namespace AMS.Repository
         }
        
 
-        Task<IEnumerable<Attendance>> IAdminRepository.GetAttendanceByIdAsync(string idColumn, int id)
+        // Get Attendance By Id or Date
+        Task<IEnumerable<Attendance>> IAdminRepository.GetAttendanceByIdAsync(string idColumn, object value)
         {
-            return _employeeAttendance.GetAttendanceByIdAsync(idColumn, id);
+            return _employeeAttendance.GetAttendanceByIdAsync(idColumn, value);
         }
 
     }

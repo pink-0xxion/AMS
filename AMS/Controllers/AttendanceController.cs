@@ -1,5 +1,6 @@
 ﻿using AMS.Interfaces;
 using AMS.Models;
+using AMS.Models.ViewModel;
 using AMS.Repository;
 using CRM.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ namespace AMS.Controllers
             _adminRepository = adminRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var email = HttpContext.Session.GetString("UserSession");
 
@@ -26,7 +27,43 @@ namespace AMS.Controllers
                 return RedirectToAction("Login", "Dashboard");
             }
 
-            return View();
+            var employee = await _adminRepository.GetAllAsync();
+            int totalEmployees = employee.Count();
+
+            string idColumn = "AttendanceDate";
+            var attendence = await _adminRepository.GetAttendanceByIdAsync(idColumn, DateTime.Today);
+
+            int presentToday = 0;
+            int absentToday = 0;
+            int onLeave = 0;
+
+            foreach (var item in attendence)
+            {
+                if (item.Status == "Present" | item.Status == "present")
+                {
+                    presentToday++;
+                }
+                if (item.Status == "Absent" | item.Status == "absent")
+                {
+                    absentToday++;
+                }
+                if (item.Status == "Leave" | item.Status == "leave")
+                {
+                    onLeave++;
+                }
+
+            }
+
+            var employeeStatus = new EmployeeStatusViewModel
+            {
+                TotalEmployees = totalEmployees,
+                PresentToday = presentToday,
+                AbsentToday = absentToday,
+                OnLeave = onLeave
+            };
+
+
+            return View(employeeStatus);
         }
 
         public async Task<IActionResult> GetEmployees()
@@ -35,7 +72,8 @@ namespace AMS.Controllers
 
             var employee = await _adminRepository.GetAllAsync();
 
-            var result = employee.Select(e => new {
+            var result = employee.Select(e => new
+            {
                 id = e.EmployeeId,
                 name = e.FirstName + " " + e.LastName
             });
@@ -49,7 +87,8 @@ namespace AMS.Controllers
 
             var employeeDetails = await _adminRepository.GetAllAsync();
 
-            var employeeResult = employeeDetails.Select(e => new {
+            var employeeResult = employeeDetails.Select(e => new
+            {
                 id = e.EmployeeId,
                 name = e.FirstName + " " + e.LastName
             }).ToList();
@@ -57,7 +96,8 @@ namespace AMS.Controllers
             var result = await _adminRepository.GetAttendanceByMonthYearAsync(employee, month, year);
 
             // Join attendance with employee name
-            var enrichedResult = result.Select(att => {
+            var enrichedResult = result.Select(att =>
+            {
                 var emp = employeeResult.FirstOrDefault(e => e.id == att.EmployeeID);
                 return new
                 {
