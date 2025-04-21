@@ -1,5 +1,5 @@
 ﻿using AMS.Interfaces;
-using AMS.Models;
+using AMS.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 

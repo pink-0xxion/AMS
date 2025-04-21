@@ -42,6 +42,38 @@
         $(this).attr('aria-hidden', 'true'); // Restore when closed
         $("#mapIframe").attr("src", "");
     });
+
+
+
+    //Live clock 
+    function updateClock() {
+        const now = new Date();
+
+        const options = {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+            timeZone: 'Asia/Kolkata' // Indian Standard Time
+        };
+
+        const formattedTime = now.toLocaleString('en-IN', options);
+        document.getElementById('liveClock').textContent = formattedTime;
+    }
+
+    setInterval(updateClock, 1000); // update every second
+    updateClock(); // initial call
+
+
+
+
+
+
+
 });
 
 // ✅ Unified Function for Handling Check-In & Check-Out
@@ -182,6 +214,10 @@ document.addEventListener("DOMContentLoaded", () => {
     logMonth.addEventListener('change', loadAttendanceLogs);
     logDay.addEventListener('change', loadAttendanceLogs);
 });
+
+
+
+
 
 // Fetch Attendance Data
 function fetchAttendance() {

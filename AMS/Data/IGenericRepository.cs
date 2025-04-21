@@ -1,4 +1,5 @@
 ﻿using AMS.Models;
+using AMS.Models.ViewModel;
 
 namespace AMS.Data
 
@@ -51,7 +52,7 @@ namespace AMS.Data
 
 
         // Get Attendance By Id
-        Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id);
+        //Task<IEnumerable<T>> GetAttendanceByIdAsync(string idColumn, int id);
 
 
         Task<IEnumerable<AttendanceLogDto>> GetAttendanceLogsAsync(int employeeId, int year, int month, int day);

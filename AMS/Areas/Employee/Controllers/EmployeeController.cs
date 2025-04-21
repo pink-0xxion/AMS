@@ -1,5 +1,6 @@
 ﻿using AMS.Interfaces;
 using AMS.Models;
+using AMS.Models.ViewModel;
 using AMS.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

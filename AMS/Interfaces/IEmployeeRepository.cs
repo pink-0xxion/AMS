@@ -1,4 +1,5 @@
 ﻿using AMS.Models;
+using AMS.Models.ViewModel;
 
 namespace AMS.Interfaces
 {

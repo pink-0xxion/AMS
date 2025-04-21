@@ -1,6 +1,7 @@
 ﻿using AMS.Interfaces;
 using AMS.Models;
 using AMS.Data;
+using AMS.Models.ViewModel;
 
 namespace AMS.Repository
 {

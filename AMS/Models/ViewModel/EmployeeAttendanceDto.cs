@@ -1,4 +1,4 @@
-﻿namespace AMS.Models
+﻿namespace AMS.Models.ViewModel
 {
     public class EmployeeAttendanceDto
     {
