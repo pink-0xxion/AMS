@@ -1,4 +1,135 @@
-﻿@using AMS.Models.ViewModel
+﻿@model IEnumerable<AMS.Models.ViewModel.AttendanceLogDto>
+
+@if (Model.Any())
+{
+    foreach (var log in Model)
+    {
+        TimeSpan? checkIn = TimeSpan.TryParse(log.CheckInTime, out var inTime) ? inTime : (TimeSpan?)null;
+        TimeSpan? checkOut = TimeSpan.TryParse(log.CheckOutTime, out var outTime) ? outTime : (TimeSpan?)null;
+        TimeSpan? workDuration = (checkIn.HasValue && checkOut.HasValue) ? (outTime - inTime) : null;
+
+        <tr>
+            <td>@log.LogDateTime.ToString("dd-MM-yyyy HH:mm")</td>
+            <td>@log.CheckInTime</td>
+            <td>@log.CheckOutTime</td>
+            <td>
+                @if (workDuration.HasValue)
+                {
+                    @($"{(int)workDuration.Value.TotalHours:D2}:{workDuration.Value.Minutes:D2} hrs")
+                }
+                else
+                {
+                    <span class="text-muted">N/A</span>
+                }
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="4" class="text-center text-muted">
+            No attendance logs found for the selected date.
+        </td>
+    </tr>
+}
+
+
+
+
+@* @model IEnumerable<AMS.Models.ViewModel.AttendanceLogDto>
+
+@if (Model.Any())
+{
+    foreach (var log in Model)
+    {
+        TimeSpan? checkIn = TimeSpan.TryParse(log.CheckInTime, out var inTime) ? inTime : (TimeSpan?)null;
+        TimeSpan? checkOut = TimeSpan.TryParse(log.CheckOutTime, out var outTime) ? outTime : (TimeSpan?)null;
+        TimeSpan? workDuration = (checkIn.HasValue && checkOut.HasValue) ? (outTime - inTime) : null;
+
+        <tr>
+            <td>@log.LogDateTime.ToString("g")</td>
+            <td>@log.CheckInTime</td>
+            <td>@log.CheckOutTime</td>
+            <td>
+                @if (workDuration.HasValue)
+                {
+                    @($"{(int)workDuration.Value.TotalHours:D2}:{workDuration.Value.Minutes:D2} hrs")
+                }
+                else
+                {
+                    <span class="text-muted">N/A</span>
+                }
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="4" class="text-center text-muted">No attendance logs found for the selected date.</td>
+    </tr>
+}
+
+ *@
+
+
+
+
+@* @using AMS.Models.ViewModel
+@model IEnumerable<AttendanceLogDto>
+
+<table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-primary">
+        <tr>
+            <th>Log Date</th>
+            <th>Check-In</th>
+            <th>Check-Out</th>
+            <th>Work Hours2</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var log in Model)
+            {
+                TimeSpan? checkIn = TimeSpan.TryParse(log.CheckInTime, out var inTime) ? inTime : (TimeSpan?)null;
+                TimeSpan? checkOut = TimeSpan.TryParse(log.CheckOutTime, out var outTime) ? outTime : (TimeSpan?)null;
+                TimeSpan? workDuration = (checkIn.HasValue && checkOut.HasValue) ? (outTime - inTime) : null;
+
+                <tr>
+                    <td>@log.LogDateTime.ToString("g")</td>
+                    <td>@log.CheckInTime</td>
+                    <td>@log.CheckOutTime</td>
+                    <td>
+                        @if (workDuration.HasValue)
+                        {
+                            @($"{(int)workDuration.Value.TotalHours:D2}:{workDuration.Value.Minutes:D2} hrs")
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center text-muted">No attendance logs found for the selected date.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+ *@
+
+
+
+@* @using AMS.Models.ViewModel
 @model IEnumerable<AttendanceLogDto>
 
 @if (Model.Any())
@@ -19,25 +150,8 @@ else
     </tr>
 }
 
-
-
-@* @model IEnumerable<AMS.Models.AttendanceLogDto>
-
-@if (!Model.Any())
-{
-    <tr>
-        <td colspan="3" class="text-center">No logs found for selected date.</td>
-    </tr>
-}
-else
-{
-    foreach (var log in Model)
-    {
-        <tr>
-            <td>@log.LogDateTime.ToString("g")</td>
-            <td>@log.CheckInTime </td>
-            <td>@log.CheckOutTime</td>
-        </tr>
-    }
-}
  *@
+
+
+
+

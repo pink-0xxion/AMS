@@ -30,4 +30,8 @@ public partial class Attendance
     public string? Remarks { get; set; }
 
     //public virtual Employees Employee { get; set; } = null!;
+
+    public string? RemarksOut { get; set; }
+    public string? CheckinIP { get; set; }
+    public string? CheckoutIP { get; set; }
 }

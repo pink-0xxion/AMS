@@ -56,10 +56,22 @@ namespace AMS.Areas.Employee.Controllers
         {
             Console.WriteLine("CheckIn Controller called");
 
+            var forwardedIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            var ip = string.IsNullOrEmpty(forwardedIp)
+                ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString()
+                : forwardedIp;
+
+            Console.WriteLine($"User IP: {ip}");
+            //Console.WriteLine($"User IP: {HttpContext.Connection.RemoteIpAddress}");
+            
+            // Use it for logging, storing, etc.
+
+
             var checkInTime = DateTime.Now.TimeOfDay; // Use TimeSpan
+
             string remarks = $"{location}";
             // string remarks = $"Checked in from {location}";
-            bool isCheckedIn = await _employeeRepository.CheckInAsync(employeeId, remarks);
+            bool isCheckedIn = await _employeeRepository.CheckInAsync(employeeId, remarks,ip);
 
             if (isCheckedIn)
             {
@@ -80,7 +92,7 @@ namespace AMS.Areas.Employee.Controllers
         private static readonly HashSet<int> _processingCheckOuts = new HashSet<int>(); // Global hash set to track processing employees
 
         [HttpPost]
-        public async Task<IActionResult> CheckOut(int employeeId)
+        public async Task<IActionResult> CheckOut(int employeeId, string location)
         {
             if (_processingCheckOuts.Contains(employeeId))
             {
@@ -106,8 +118,23 @@ namespace AMS.Areas.Employee.Controllers
 
                 Console.WriteLine("After GetAttendanceByEmployeeDateAsync");
 
+                //ip update
+                var forwardedIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                var ip = string.IsNullOrEmpty(forwardedIp)
+                    ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString()
+                    : forwardedIp;
+
+                Console.WriteLine($"User IP: {ip}");
+
+
+                var remarksOut = location;
+
                 attendance.CheckOutTime = checkOutTime;
+                attendance.RemarksOut = remarksOut;
+                attendance.CheckoutIP = ip;
+
                 await _employeeRepository.UpdateAttendanceAsync(attendance);
+
                 await _employeeRepository.LogCheckOutAsync(attendance.AttendanceID, attendance.CheckInTime, checkOutTime);
 
                 return Ok(new { message = "Checked out successfully", checkOutTime });
@@ -146,6 +173,13 @@ namespace AMS.Areas.Employee.Controllers
 
             return PartialView("_AttendanceLogRows", logs);
         }
+
+
+
+
+
+
+
 
 
         public async Task<IActionResult> GetEmployeeAttendanceById(int employeeId, int month, int year)

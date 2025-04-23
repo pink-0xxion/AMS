@@ -158,72 +158,28 @@ namespace AMS.Data
             using var connection = _context.CreateConnection();
             await connection.OpenAsync(); // 👈 Ensure the connection is open
 
-            var query = "UPDATE Attendance SET CheckOutTime = @CheckOutTime WHERE EmployeeID = @EmployeeID AND AttendanceDate = @AttendanceDate";
-            await connection.ExecuteAsync(query, new { attendance.CheckOutTime, attendance.EmployeeId, attendance.AttendanceDate });
-        }
+            //var query = "UPDATE Attendance SET CheckOutTime = @CheckOutTime WHERE EmployeeID = @EmployeeID AND AttendanceDate = @AttendanceDate";
 
-
-        //DATA FETCH FROM USER
-
-        public async Task<EmployeeAttendanceDto?> GetEmployeeAttendanceByDateAsync(int employeeId)
-        {
-            using var connection = _context.CreateConnection();
-
-            string query = @"
-                SELECT 
-                    e.FirstName, 
-                    e.LastName, 
-                    e.Department, 
-                    e.Designation,
-                    COALESCE(CONVERT(VARCHAR, a.CheckInTime, 108), 'Not Available') AS CheckInTime, 
-                    COALESCE(CONVERT(VARCHAR, a.CheckOutTime, 108), 'Not Available') AS CheckOutTime, 
-                    COALESCE(a.Status, 'Not Available') AS Status, 
-                    COALESCE(a.Remarks, 'Not Available') AS Remarks
-                FROM Employees e
-                LEFT JOIN Attendance a 
-                    ON e.EmployeeId = a.EmployeeId 
-                    AND CAST(a.AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)
-                WHERE e.EmployeeId = @EmployeeId;";
-
-
-
-            return await connection.QueryFirstOrDefaultAsync<EmployeeAttendanceDto>(query, new { EmployeeId = employeeId });
-        }
-
-
-
-
-
-
-        public async Task<bool> CheckInAsync(int employeeId, string remarks)
-        {
-            var sql = @"
-        IF EXISTS (SELECT 1 FROM Attendance WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE))
-        BEGIN
+                var query = @"
             UPDATE Attendance 
-            SET CheckInTime = @CheckInTime, Status = 'Present', Remarks = @Remarks
-            WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE);
-        END
-        ELSE
-        BEGIN
-            INSERT INTO Attendance (EmployeeId, AttendanceDate, CheckInTime, Status, Remarks)
-            VALUES (@EmployeeId, GETDATE(), @CheckInTime, 'Present', @Remarks);
-        END";
+            SET 
+                CheckOutTime = @CheckOutTime,
+                RemarksOut = @RemarksOut,
+                CheckoutIP=@CheckoutIP
 
-            var parameters = new
+            WHERE EmployeeID = @EmployeeID AND AttendanceDate = @AttendanceDate";
+
+            //await connection.ExecuteAsync(query, new { attendance.CheckOutTime, attendance.EmployeeId, attendance.AttendanceDate });
+
+            await connection.ExecuteAsync(query, new
             {
-                EmployeeId = employeeId,
-                CheckInTime = DateTime.Now.TimeOfDay, // Store only time part
-                Remarks = remarks
-            };
-
-            using var connection = _context.CreateConnection(); // ✅ Open connection
-            var result = await connection.ExecuteAsync(sql, parameters); // ✅ Use the connection
-            return result > 0;
+                attendance.CheckOutTime,
+                attendance.RemarksOut,
+                attendance.EmployeeId,
+                attendance.AttendanceDate,
+                attendance.CheckoutIP
+            });
         }
-
-
-
 
 
 
@@ -244,6 +200,103 @@ namespace AMS.Data
                 CheckOutTime = checkOutTime
             });
         }
+
+
+
+        //DATA FETCH FROM USER
+
+        public async Task<EmployeeAttendanceDto?> GetEmployeeAttendanceByDateAsync(int employeeId)
+        {
+            using var connection = _context.CreateConnection();
+
+            string query = @"
+                SELECT 
+                    e.FirstName, 
+                    e.LastName, 
+                    e.Department, 
+                    e.Designation,
+                    COALESCE(CONVERT(VARCHAR, a.CheckInTime, 108), 'Not Available') AS CheckInTime, 
+                    COALESCE(CONVERT(VARCHAR, a.CheckOutTime, 108), 'Not Available') AS CheckOutTime, 
+                    COALESCE(a.Status, 'Not Available') AS Status, 
+                    COALESCE(a.Remarks, 'Not Available') AS Remarks,
+                    COALESCE(a.RemarksOut, 'Not Available') AS RemarksOut
+                FROM Employees e
+                LEFT JOIN Attendance a 
+                    ON e.EmployeeId = a.EmployeeId 
+                    AND CAST(a.AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)
+                WHERE e.EmployeeId = @EmployeeId;";
+
+
+
+            return await connection.QueryFirstOrDefaultAsync<EmployeeAttendanceDto>(query, new { EmployeeId = employeeId });
+        }
+
+
+
+
+
+
+        public async Task<bool> CheckInAsync(int employeeId, string remarks, string ip)
+        {
+            var sql = @"
+        IF EXISTS (SELECT 1 FROM Attendance WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE))
+        BEGIN
+            UPDATE Attendance 
+            SET CheckInTime = @CheckInTime, Status = 'Present', Remarks = @Remarks ,CheckinIP =@CheckinIP
+            WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE);
+        END
+        ELSE
+        BEGIN
+            INSERT INTO Attendance (EmployeeId, AttendanceDate, CheckInTime, Status, Remarks,CheckinIP)
+            VALUES (@EmployeeId, GETDATE(), @CheckInTime, 'Present', @Remarks,@CheckinIP);
+        END";
+
+            var parameters = new
+            {
+                EmployeeId = employeeId,
+                CheckInTime = DateTime.Now.TimeOfDay, // Store only time part
+                Remarks = remarks,
+                CheckinIP=ip
+            };
+
+            using var connection = _context.CreateConnection(); // ✅ Open connection
+            var result = await connection.ExecuteAsync(sql, parameters); // ✅ Use the connection
+            return result > 0;
+        }
+
+
+        // Log CheckOut
+
+        //public async Task<bool> CheckOutAsync(int employeeId, string remarksout)
+        //{
+        //    var sql = @"
+        //IF EXISTS (SELECT 1 FROM Attendance WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE))
+        //BEGIN
+        //    UPDATE Attendance 
+        //    SET CheckInTime = @CheckInTime, Status = 'Present', RemarksOut = @RemarksOut
+        //    WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE);
+        //END
+        //ELSE
+        //BEGIN
+        //    INSERT INTO Attendance (EmployeeId, AttendanceDate, CheckInTime, Status, Remarks)
+        //    VALUES (@EmployeeId, GETDATE(), @CheckInTime, 'Present', @RemarksOut);
+        //END";
+
+        //    var parameters = new
+        //    {
+        //        EmployeeId = employeeId,
+        //        CheckInTime = DateTime.Now.TimeOfDay, // Store only time part
+        //        RemarksOut = remarksout
+        //    };
+
+        //    using var connection = _context.CreateConnection(); // ✅ Open connection
+        //    var result = await connection.ExecuteAsync(sql, parameters); // ✅ Use the connection
+        //    return result > 0;
+        //}
+
+
+
+
 
 
 

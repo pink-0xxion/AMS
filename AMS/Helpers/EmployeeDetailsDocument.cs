@@ -66,20 +66,20 @@ namespace AMS.Helpers
                             });
                         });
 
-                        empBox.Item().Row(row =>
-                        {
-                            row.RelativeItem().Text(txt =>
-                            {
-                                txt.Span("📱 Phone: ").SemiBold();
-                                txt.Span($"{_model.Employee?.PhoneNumber ?? "N/A"}");
-                            });
+                        //empBox.Item().Row(row =>
+                        //{
+                        //    row.RelativeItem().Text(txt =>
+                        //    {
+                        //        txt.Span("📱 Phone: ").SemiBold();
+                        //        txt.Span($"{_model.Employee?.PhoneNumber ?? "N/A"}");
+                        //    });
 
-                            row.RelativeItem().Text(txt =>
-                            {
-                                txt.Span("🧑‍💼 Designation: ").SemiBold();
-                                txt.Span($"{_model.Employee?.Designation ?? "N/A"}");
-                            });
-                        });
+                        //    row.RelativeItem().Text(txt =>
+                        //    {
+                        //        txt.Span("🧑‍💼 Designation: ").SemiBold();
+                        //        txt.Span($"{_model.Employee?.Designation ?? "N/A"}");
+                        //    });
+                        //});
 
                         empBox.Item().Row(row =>
                         {
@@ -89,7 +89,13 @@ namespace AMS.Helpers
                                 txt.Span($"{_model.Employee?.Department ?? "N/A"}");
                             });
 
-                            row.RelativeItem().Text(""); // Empty to balance layout
+                            row.RelativeItem().Text(txt =>
+                            {
+                                txt.Span("🧑‍💼 Designation: ").SemiBold();
+                                txt.Span($"{_model.Employee?.Designation ?? "N/A"}");
+                            });
+
+                            //row.RelativeItem().Text(""); // Empty to balance layout
                         });
                     });
 

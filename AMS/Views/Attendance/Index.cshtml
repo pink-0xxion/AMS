@@ -2,11 +2,11 @@
 @* @model IEnumerable<Attendance> *@
 
 @{
-    Layout = "~/Areas/Admin/Views/Shared/_Layout4.cshtml";
-    ViewData["Title"] = "Index";
+	Layout = "~/Areas/Admin/Views/Shared/_Layout4.cshtml";
+	ViewData["Title"] = "Index";
 }
 
-	@* @foreach (var item in Model)
+@* @foreach (var item in Model)
 	{
 		<p>@item.AttendanceId</p>
 		<p>@item.EmployeeId</p>
@@ -17,7 +17,7 @@
 	}
  *@
 
-	 
+
 <!--start row-->
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
 	<div class="col">
@@ -99,50 +99,68 @@
 </div>
 <!--end row-->
 
+
+
+
+<!--Clock -->
+
+<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center px-4 py-3">
+	<h5 class="mb-0 fw-bold">Employee Attendance Details</h5>
+	<span id="liveClock" class="fs-5 fw-semibold"></span>
+</div>
+
+
+
+
+
 @* 
 <h1 class="text-center fw-bold text-success mb-4" style="font-size: 2.5rem;">
     📋 Attendance Sheet
 </h1> *@
 
+
+@* attendance view *@
+
+
 <div class="container my-4">
-    <form id="attendanceForm">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label for="employee" class="form-label">Select Employee</label>
-                <select id="employee" name="employee" class="form-select">
-                    <option value="">-- Select Employee --</option>
-                </select>
-            </div>
+	<form id="attendanceForm">
+		<div class="row g-3 align-items-end">
+			<div class="col-md-4">
+				<label for="employee" class="form-label">Select Employee</label>
+				<select id="employee" name="employee" class="form-select">
+					<option value="">-- Select Employee --</option>
+				</select>
+			</div>
 
-            <div class="col-md-3">
-                <label for="month" class="form-label">Month</label>
-                <select name="month" class="form-select">
-                    <option value="">-- Select Month --</option>
-                    @for (int m = 1; m <= 12; m++)
-                    {
-                        <option value="@m">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
-                    }
-                </select>
-            </div>
+			<div class="col-md-3">
+				<label for="month" class="form-label">Month</label>
+				<select name="month" class="form-select">
+					<option value="">-- Select Month --</option>
+					@for (int m = 1; m <= 12; m++)
+					{
+						<option value="@m">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+					}
+				</select>
+			</div>
 
-            <div class="col-md-3">
-                <label for="year" class="form-label">Year</label>
-                <select name="year" class="form-select">
-                    <option value="">-- Select Year --</option>
-                    @for (int y = DateTime.Now.Year; y >= 2000; y--)
-                    {
-                        <option value="@y">@y</option>
-                    }
-                </select>
-            </div>
+			<div class="col-md-3">
+				<label for="year" class="form-label">Year</label>
+				<select name="year" class="form-select">
+					<option value="">-- Select Year --</option>
+					@for (int y = DateTime.Now.Year; y >= 2000; y--)
+					{
+						<option value="@y">@y</option>
+					}
+				</select>
+			</div>
 
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    🔍 Show
-                </button>
-            </div>
-        </div>
-    </form>
+			<div class="col-md-2">
+				<button type="submit" class="btn btn-primary w-100">
+					🔍 Show
+				</button>
+			</div>
+		</div>
+	</form>
 </div>
 
 
@@ -174,4 +192,12 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/attendance.js"></script>
 *@
- 
+
+
+
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/attendance.js"></script>
+<script src="~/js/Clock.js"></script>

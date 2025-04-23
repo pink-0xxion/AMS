@@ -6,7 +6,7 @@ namespace AMS.Interfaces
     public interface IEmployeeRepository
     {
 
-        Task<bool> CheckInAsync(int employeeId, string remarks);
+        Task<bool> CheckInAsync(int employeeId, string remarks, string ip);
 
 
         //not in use 

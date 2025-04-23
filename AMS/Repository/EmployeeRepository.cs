@@ -55,9 +55,9 @@ namespace AMS.Repository
         //    return await _employeeAttendance.AddAttendanceAsync(attendance);
         //}
 
-        public Task<bool> CheckInAsync(int employeeId, string remarks)
+        public Task<bool> CheckInAsync(int employeeId, string remarks, string ip)
         {
-         return _employeeAttendance.CheckInAsync(employeeId, remarks);
+         return _employeeAttendance.CheckInAsync(employeeId, remarks,ip);
         }
 
 

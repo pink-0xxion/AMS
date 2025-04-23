@@ -26,7 +26,7 @@ namespace AMS.Data
 
 
 
-        Task<bool> CheckInAsync(int employeeId, string remarks);
+        Task<bool> CheckInAsync(int employeeId, string remarks, string ip);
 
 
         //not in use 

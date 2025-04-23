@@ -3,9 +3,9 @@
     GetEmployees();
 
     // Show default table when page loads
-    setTimeout(() => {
-        fetchAttendance();
-    }, 200); // Delay to ensure GetEmployees has populated the dropdown
+    //setTimeout(() => {
+    //    fetchAttendance();
+    //}, 200); // Delay to ensure GetEmployees has populated the dropdown
 
     // Safe as it only runs when form already rendered, placing of <script> doesn't matter
     $('#attendanceForm').on('submit', function (e) {
@@ -21,6 +21,8 @@
         }
 
         fetchAttendance();
+
+
     });
 })
 
@@ -55,6 +57,10 @@ function GetEmployees() {
             $.each(result, function (i, data) {
                 $('#employee').append('<option value="' + data.id + '">' + data.name + '</option>');
             });
+
+            fetchAttendance();
+
+
         },
         error: function (xhr, status, error) {
             console.error("Error fetching employees:", error);
@@ -72,24 +78,38 @@ function fetchAttendance() {
     //const year = $('select[name="year"]').val();
 
     // Get current month and year
+
+
     const today = new Date();
-    const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
-    const currentYear = today.getFullYear();
+
+
+    //const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
+    //const currentYear = today.getFullYear();
 
     // default fallback
-    const employeeId = $('#employee').val() ? $('#employee').val() : 0;
-    const month = $('select[name="month"]').val() ? $('select[name="month"]').val() : currentMonth;
-    const year = $('select[name="year"]').val() ? $('select[name="year"]').val() : currentYear;
+    //const employeeId = $('#employee').val() ? $('#employee').val() : 0;
+    //const month = $('select[name="month"]').val() ? $('select[name="month"]').val() : currentMonth;
+    //const year = $('select[name="year"]').val() ? $('select[name="year"]').val() : currentYear;
 
-    console.log("employeeId: ", employeeId);
-    console.log("month: ", month);
-    console.log("year: ", year);
+
+    const month = $('select[name="month"]').val() || today.getMonth() + 1;
+    const year = $('select[name="year"]').val() || today.getFullYear();
+    const employeeId = $("#employee").val() || 0; // Using the employeeId from Razor
+
+
+
+
+
+    //console.log("employeeId: ", employeeId);
+    //console.log("month: ", month);
+    //console.log("year: ", year);
 
 
     //if (!employeeId || !month || !year) {
     //    alert("Please select employee, month, and year.");
     //    return;
     //}
+
 
     $.ajax({
         url: '/Attendance/GetEmployeeAttendance',
@@ -100,7 +120,8 @@ function fetchAttendance() {
             year: year
         },
         success: function (data) {
-            console.log("Attendance Data:", data);
+
+            //console.log("Attendance Data:", data);
 
             const tableHead = $('#attendanceHead');
             const tableBody = $('#attendanceBody');

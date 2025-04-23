@@ -51,6 +51,32 @@
             {
                 <span>No remarks</span>
             }
+
+            <p><strong>RemarksOut:</strong></p>
+
+            @if (!string.IsNullOrEmpty(Model.RemarksOut) && Model.RemarksOut.Contains("Lat:") && Model.RemarksOut.Contains("Long:"))
+            {
+                var latStartOut = Model.RemarksOut.IndexOf("Lat:") + 4;
+                var longStartOut = Model.RemarksOut.IndexOf("Long:") + 6;
+
+                if (latStartOut > 3 && longStartOut > 5) // Ensure valid positions
+                {
+                    var latOut = Model.RemarksOut.Substring(latStartOut, Model.RemarksOut.IndexOf(",", latStartOut) - latStartOut).Trim();
+                    var lngOut = Model.RemarksOut.Substring(longStartOut).Trim();
+
+                    <button class="btn btn-warning view-location-btn" data-lat="@latOut" data-lng="@lngOut">
+                        📍 View Check-Out Location
+                    </button>
+                }
+                else
+                {
+                    <span>@Model.RemarksOut</span>
+                }
+            }
+            else
+            {
+                <span>No check-out remarks</span>
+            }
         </div>
     </div>
 </div>

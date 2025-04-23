@@ -395,7 +395,20 @@ namespace AMS.Areas.Admin.Controllers
             var document = new EmployeeDetailsDocument(model);
             var pdfBytes = document.GeneratePdf();
 
-            return File(pdfBytes, "application/pdf", "EmployeeDetails_QuestPDF.pdf");
+            // Format filename: AnkitApril25
+            var monthName = DateTime.Now.ToString("MMMM");
+            var yearTwoDigit = DateTime.Now.ToString("yy");
+            var firstName = employee?.FirstName?.Replace(" ", "") ?? "Employee";
+            var lastName = employee?.LastName?.Replace(" ", "") ?? "";
+
+            var fullName = $"{firstName}{lastName}";
+            var fileName = $"{fullName}{monthName}{yearTwoDigit}.pdf";
+
+            return File(pdfBytes, "application/pdf", fileName);
+
+
+
+
         }
 
         public IActionResult Logout()

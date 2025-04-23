@@ -18,6 +18,8 @@
         e.preventDefault();
         fetchAttendance();
     });
+
+
     //----------------------------------------------------
 
     LoadAttendanceDetails(); // Load attendance on page load
@@ -37,6 +39,7 @@
         $("#mapModal").modal('show');
     });
 
+
     // Ensure iframe is cleared when modal closes
     $("#mapModal").on("hidden.bs.modal", function () {
         $(this).attr('aria-hidden', 'true'); // Restore when closed
@@ -45,36 +48,11 @@
 
 
 
-    //Live clock 
-    function updateClock() {
-        const now = new Date();
-
-        const options = {
-            weekday: 'long',
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true,
-            timeZone: 'Asia/Kolkata' // Indian Standard Time
-        };
-
-        const formattedTime = now.toLocaleString('en-IN', options);
-        document.getElementById('liveClock').textContent = formattedTime;
-    }
-
-    setInterval(updateClock, 1000); // update every second
-    updateClock(); // initial call
-
-
-
-
-
-
-
 });
+
+
+
+
 
 // ✅ Unified Function for Handling Check-In & Check-Out
 function handleAttendance(action) {
@@ -88,7 +66,9 @@ function handleAttendance(action) {
     let requestData = { employeeId, action };
     let url = `/Employee/Employee/${action}`;
 
-    if (action === 'CheckIn' && navigator.geolocation) {
+    //if (['CheckIn', 'CheckOut'].includes(action) && navigator.geolocation)
+
+    if ((action === 'CheckIn' || action === 'CheckOut') && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 requestData.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
@@ -229,9 +209,9 @@ function fetchAttendance() {
     const employeeId = $("#employee").val(); // Using the employeeId from Razor
 
 
-    console.log(month);
-    console.log(year);
-    console.log(employeeId);
+    //console.log(month);
+    //console.log(year);
+    //console.log(employeeId);
 
     $.ajax({
         url: '/Employee/Employee/GetEmployeeAttendanceById',
@@ -241,10 +221,17 @@ function fetchAttendance() {
             month: month,
             year: year
         },
+       
+     
+
+
 
         success: function (data) {
+            
+            //console.log(`${data}`);
 
-            //console.log("Fetched Data: " + data);
+            //console.logFetched Data: " + data);
+
             //console.log("Fetched Data: " + JSON.stringify(data, null, 2));
 
             const tableHead = $('#attendanceHead');
