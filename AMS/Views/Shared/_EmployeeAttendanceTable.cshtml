@@ -50,7 +50,7 @@
 
        @*  bg-success,bg-danger,bg-warning,bg-info *@
         
-        <div id="attendanceTableContainer">
+       @*  <div id="attendanceTableContainer">
             <div class="table-responsive mt-4">
                 <table class="table table-bordered text-center align-middle" id="attendanceTable">
                     <thead id="attendanceHead">
@@ -61,7 +61,29 @@
                     </tbody>
                 </table>
             </div>
+        </div> *@
+
+
+
+
+
+        <div id="attendanceTableContainer" class="mt-4">
+            <div style="overflow-x: auto; width: 100%;">
+                <table class="table table-bordered text-center align-middle w-100" id="attendanceTable" style="min-width: 1200px;">
+                    <thead id="attendanceHead">
+                        <!-- JS will insert headers -->
+                    </thead>
+                    <tbody id="attendanceBody">
+                        <!-- JS will insert data -->
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+
+
+ 
+
 
     </div>
 </div>
