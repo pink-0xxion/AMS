@@ -56,6 +56,7 @@ namespace AMS.Areas.Employee.Controllers
         {
             Console.WriteLine("CheckIn Controller called");
 
+
             var forwardedIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             var ip = string.IsNullOrEmpty(forwardedIp)
                 ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString()
@@ -69,9 +70,29 @@ namespace AMS.Areas.Employee.Controllers
 
             var checkInTime = DateTime.Now.TimeOfDay; // Use TimeSpan
 
-            string remarks = $"{location}";
+            double? checkInLat = null;
+            double? checkInLong = null;
+
+            if (!string.IsNullOrWhiteSpace(location))
+            {
+                var parts = location.Split(',');
+                if (parts.Length == 2 &&
+                    double.TryParse(parts[0], out double lat) &&
+                    double.TryParse(parts[1], out double lng))
+                {
+                    checkInLat = lat;
+                    checkInLong = lng;
+                }
+            }
+
+            Console.WriteLine($"1Lat: {checkInLat},1Long: {checkInLong}");
+
+        
+
+
             // string remarks = $"Checked in from {location}";
-            bool isCheckedIn = await _employeeRepository.CheckInAsync(employeeId, remarks,ip);
+            bool isCheckedIn = await _employeeRepository.CheckInAsync(employeeId,ip, checkInLat, checkInLong);
+
 
             if (isCheckedIn)
             {
@@ -127,10 +148,28 @@ namespace AMS.Areas.Employee.Controllers
                 Console.WriteLine($"User IP: {ip}");
 
 
-                var remarksOut = location;
+
+                double? checkOutLat = null;
+                double? checkOutLong = null;
+
+                if (!string.IsNullOrWhiteSpace(location))
+                {
+                    var parts = location.Split(',');
+                    if (parts.Length == 2 &&
+                        double.TryParse(parts[0], out double lat) &&
+                        double.TryParse(parts[1], out double lng))
+                    {
+                        checkOutLat = lat;
+                        checkOutLong = lng;
+                    }
+                }
+
+
+              
 
                 attendance.CheckOutTime = checkOutTime;
-                attendance.RemarksOut = remarksOut;
+                attendance.CheckOutLat = checkOutLat;
+                attendance.CheckOutLong = checkOutLong;
                 attendance.CheckoutIP = ip;
 
                 await _employeeRepository.UpdateAttendanceAsync(attendance);

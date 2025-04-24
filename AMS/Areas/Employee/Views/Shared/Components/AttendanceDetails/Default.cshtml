@@ -26,57 +26,44 @@
             </div>
 
             <hr />
-            <p><strong>Remarks:</strong></p>
 
-            @if (!string.IsNullOrEmpty(Model.Remarks) && Model.Remarks.Contains("Lat:") && Model.Remarks.Contains("Long:"))
+
+
+            <p><strong>Check-In Location:</strong></p>
+
+            @if (Model.CheckInLat.HasValue && Model.CheckInLong.HasValue)
             {
-                var latStart = Model.Remarks.IndexOf("Lat:") + 4;
-                var longStart = Model.Remarks.IndexOf("Long:") + 6;
+                var lat = Model.CheckInLat.Value;
+                var lng = Model.CheckInLong.Value;
 
-                if (latStart > 3 && longStart > 5) // Ensure valid positions
-                {
-                    var lat = Model.Remarks.Substring(latStart, Model.Remarks.IndexOf(",", latStart) - latStart).Trim();
-                    var lng = Model.Remarks.Substring(longStart).Trim();
-
-                    <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
-                        📍 View Location
-                    </button>
-                }
-                else
-                {
-                    <span>@Model.Remarks</span>
-                }
+                <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
+                    📍 View Location
+                </button>
             }
             else
             {
-                <span>No remarks</span>
+                <span>Location not available</span>
             }
 
-            <p><strong>RemarksOut:</strong></p>
 
-            @if (!string.IsNullOrEmpty(Model.RemarksOut) && Model.RemarksOut.Contains("Lat:") && Model.RemarksOut.Contains("Long:"))
+
+            <p><strong>Check-Out Location:</strong></p>
+
+            @if (Model.CheckOutLat.HasValue && Model.CheckOutLong.HasValue)
             {
-                var latStartOut = Model.RemarksOut.IndexOf("Lat:") + 4;
-                var longStartOut = Model.RemarksOut.IndexOf("Long:") + 6;
+                var lat = Model.CheckOutLat.Value;
+                var lng = Model.CheckOutLong.Value;
 
-                if (latStartOut > 3 && longStartOut > 5) // Ensure valid positions
-                {
-                    var latOut = Model.RemarksOut.Substring(latStartOut, Model.RemarksOut.IndexOf(",", latStartOut) - latStartOut).Trim();
-                    var lngOut = Model.RemarksOut.Substring(longStartOut).Trim();
-
-                    <button class="btn btn-warning view-location-btn" data-lat="@latOut" data-lng="@lngOut">
-                        📍 View Check-Out Location
-                    </button>
-                }
-                else
-                {
-                    <span>@Model.RemarksOut</span>
-                }
+                <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
+                    📍 View Location
+                </button>
             }
             else
             {
-                <span>No check-out remarks</span>
+                <span>Location not available</span>
             }
+
+
         </div>
     </div>
 </div>

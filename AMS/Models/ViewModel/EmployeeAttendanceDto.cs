@@ -9,7 +9,15 @@
         public string CheckInTime { get; set; } = "Not Available";
         public string CheckOutTime { get; set; } = "Not Available";
         public string Status { get; set; } = "Not Available";
-        public string Remarks { get; set; } = "Not Available";
-        public string RemarksOut { get; set; } = "Not Available";
+
+        //public string Remarks { get; set; } = "Not Available";
+        //public string RemarksOut { get; set; } = "Not Available";
+
+
+        public double? CheckInLat { get; set; }
+        public double? CheckInLong { get; set; }
+        public double? CheckOutLat { get; set; }
+        public double? CheckOutLong { get; set; }
+
     }
 }

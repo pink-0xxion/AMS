@@ -71,7 +71,8 @@ function handleAttendance(action) {
     if ((action === 'CheckIn' || action === 'CheckOut') && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                requestData.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
+                //requestData.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
+                requestData.location = `${position.coords.latitude},${position.coords.longitude}`;
                 sendAttendanceRequest(url, requestData);
             },
             (error) => {

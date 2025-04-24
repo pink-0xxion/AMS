@@ -27,11 +27,20 @@ public partial class Attendance
 
     public string Status { get; set; } = null!;
 
-    public string? Remarks { get; set; }
+
+    //public string? Remarks { get; set; }
 
     //public virtual Employees Employee { get; set; } = null!;
 
-    public string? RemarksOut { get; set; }
+    //public string? RemarksOut { get; set; }
+
+
     public string? CheckinIP { get; set; }
     public string? CheckoutIP { get; set; }
+
+    public double? CheckInLat { get; set; }
+    public double? CheckInLong { get; set; }
+    public double? CheckOutLat { get; set; }
+    public double? CheckOutLong { get; set; }
+
 }
