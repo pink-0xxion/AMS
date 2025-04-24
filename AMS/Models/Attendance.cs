@@ -34,6 +34,7 @@ public partial class Attendance
 
     //public string? RemarksOut { get; set; }
 
+    public string? FollowUpShift { get; set; }
 
     public string? CheckinIP { get; set; }
     public string? CheckoutIP { get; set; }

@@ -26,7 +26,7 @@ namespace AMS.Data
 
 
 
-        Task<bool> CheckInAsync(int employeeId, string ip, double? checkInLat, double? checkInLong);
+        Task<bool> CheckInAsync(int employeeId, string ip, double? checkInLat, double? checkInLong, string followUpShift);
 
 
         //not in use 

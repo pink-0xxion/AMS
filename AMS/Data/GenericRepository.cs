@@ -166,7 +166,8 @@ namespace AMS.Data
                 CheckOutTime = @CheckOutTime,
                 CheckOutLat = @CheckOutLat,
                 CheckOutLong = @CheckOutLong,
-                CheckoutIP=@CheckoutIP
+                CheckoutIP=@CheckoutIP,
+                FollowUpShift=@followUpShift
 
             WHERE EmployeeID = @EmployeeID AND AttendanceDate = @AttendanceDate";
 
@@ -179,7 +180,9 @@ namespace AMS.Data
                 attendance.CheckOutLong,
                 attendance.EmployeeId,
                 attendance.AttendanceDate,
-                attendance.CheckoutIP
+                attendance.CheckoutIP,
+                attendance.FollowUpShift
+
             });
         }
 
@@ -214,23 +217,24 @@ namespace AMS.Data
             using var connection = _context.CreateConnection();
 
             string query = @"
-        SELECT 
-            e.FirstName, 
-            e.LastName, 
-            e.Department, 
-            e.Designation,
-            COALESCE(CONVERT(VARCHAR, a.CheckInTime, 108), 'Not Available') AS CheckInTime, 
-            COALESCE(CONVERT(VARCHAR, a.CheckOutTime, 108), 'Not Available') AS CheckOutTime, 
-            COALESCE(a.Status, 'Not Available') AS Status, 
-            a.CheckInLat,
-            a.CheckInLong,
-            a.CheckOutLat,
-            a.CheckOutLong
-        FROM Employees e
-        LEFT JOIN Attendance a 
-            ON e.EmployeeId = a.EmployeeId 
-            AND CAST(a.AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)
-        WHERE e.EmployeeId = @EmployeeId;";
+            SELECT 
+                e.FirstName, 
+                e.LastName, 
+                e.Department, 
+                e.Designation,
+                COALESCE(CONVERT(VARCHAR, a.CheckInTime, 108), 'Not Available') AS CheckInTime, 
+                COALESCE(CONVERT(VARCHAR, a.CheckOutTime, 108), 'Not Available') AS CheckOutTime, 
+                COALESCE(a.Status, 'Not Available') AS Status, 
+                a.CheckInLat,
+                a.CheckInLong,
+                a.CheckOutLat,
+                a.CheckOutLong,
+                COALESCE(a.FollowUpShift, 'No') AS FollowUpShift
+            FROM Employees e
+            LEFT JOIN Attendance a 
+                ON e.EmployeeId = a.EmployeeId 
+                AND CAST(a.AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)
+            WHERE e.EmployeeId = @EmployeeId;";
 
             return await connection.QueryFirstOrDefaultAsync<EmployeeAttendanceDto>(query, new { EmployeeId = employeeId });
         }
@@ -244,39 +248,41 @@ namespace AMS.Data
      
 
 
-        public async Task<bool> CheckInAsync(int employeeId, string ip, double? checkInLat, double? checkInLong)
+        public async Task<bool> CheckInAsync(int employeeId, string ip, double? checkInLat, double? checkInLong, string followUpShift)
         {
             var sql = @"
-    IF EXISTS (SELECT 1 FROM Attendance WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE))
-    BEGIN
-        UPDATE Attendance 
-        SET CheckInTime = @CheckInTime, 
-            Status = 'Present',  
-            CheckinIP = @CheckinIP,
-            CheckInLat = @CheckInLat,
-            CheckInLong = @CheckInLong
-        WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE);
-    END
-    ELSE
-    BEGIN
-        INSERT INTO Attendance 
-            (EmployeeId, AttendanceDate, CheckInTime, Status, CheckinIP, CheckInLat, CheckInLong)
-        VALUES 
-            (@EmployeeId, GETDATE(), @CheckInTime, 'Present', @CheckinIP, @CheckInLat, @CheckInLong);
-    END";
+                    IF EXISTS (SELECT 1 FROM Attendance WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE))
+                    BEGIN
+                        UPDATE Attendance 
+                        SET CheckInTime = @CheckInTime, 
+                            Status = 'Present',  
+                            CheckinIP = @CheckinIP,
+                            CheckInLat = @CheckInLat,
+                            CheckInLong = @CheckInLong,
+                            FollowUpShift = @FollowUpShift
+                        WHERE EmployeeId = @EmployeeId AND AttendanceDate = CAST(GETDATE() AS DATE);
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO Attendance 
+                            (EmployeeId, AttendanceDate, CheckInTime, Status, CheckinIP, CheckInLat, CheckInLong, FollowUpShift)
+                        VALUES 
+                            (@EmployeeId, GETDATE(), @CheckInTime, 'Present', @CheckinIP, @CheckInLat, @CheckInLong, @FollowUpShift);
+                    END";
 
-            var parameters = new
-            {
-                EmployeeId = employeeId,
-                CheckInTime = DateTime.Now.TimeOfDay,
-                CheckinIP = ip,
-                CheckInLat = checkInLat,
-                CheckInLong = checkInLong
-            };
+                        var parameters = new
+                        {
+                            EmployeeId = employeeId,
+                            CheckInTime = DateTime.Now.TimeOfDay,
+                            CheckinIP = ip,
+                            CheckInLat = checkInLat,
+                            CheckInLong = checkInLong,
+                            FollowUpShift = followUpShift ?? "No" // Default to "No" if not provided
+                        };
 
-            using var connection = _context.CreateConnection();
-            var result = await connection.ExecuteAsync(sql, parameters);
-            return result > 0;
+                        using var connection = _context.CreateConnection();
+                        var result = await connection.ExecuteAsync(sql, parameters);
+                        return result > 0;
         }
 
 

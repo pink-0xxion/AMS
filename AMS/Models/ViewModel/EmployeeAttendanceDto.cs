@@ -13,6 +13,8 @@
         //public string Remarks { get; set; } = "Not Available";
         //public string RemarksOut { get; set; } = "Not Available";
 
+        public string FollowUpShift { get; set; } = "No";
+
 
         public double? CheckInLat { get; set; }
         public double? CheckInLong { get; set; }

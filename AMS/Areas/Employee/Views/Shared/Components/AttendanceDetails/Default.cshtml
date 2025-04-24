@@ -22,6 +22,10 @@
                         <span class="badge @(Model.Status == "Present" ? "bg-success" : "bg-danger")">@Model.Status</span>
                     </p>
                     <input type="hidden" id="attendanceStatus" value="@Model.Status" />
+                    <input type="hidden" id="checkOutTime" value="@Model.CheckOutTime" />
+                    <input type="hidden" id="checkInTime" value="@Model.CheckInTime" />
+                    <input type="hidden" id="followUpShift" value="@Model.FollowUpShift" />
+
                 </div>
             </div>
 

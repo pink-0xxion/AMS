@@ -52,7 +52,7 @@ namespace AMS.Areas.Employee.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CheckIn(int employeeId, string location)
+        public async Task<IActionResult> CheckIn(int employeeId, string location, string followUpShift)
         {
             Console.WriteLine("CheckIn Controller called");
 
@@ -91,7 +91,7 @@ namespace AMS.Areas.Employee.Controllers
 
 
             // string remarks = $"Checked in from {location}";
-            bool isCheckedIn = await _employeeRepository.CheckInAsync(employeeId,ip, checkInLat, checkInLong);
+            bool isCheckedIn = await _employeeRepository.CheckInAsync(employeeId,ip, checkInLat, checkInLong, followUpShift);
 
 
             if (isCheckedIn)
@@ -113,7 +113,7 @@ namespace AMS.Areas.Employee.Controllers
         private static readonly HashSet<int> _processingCheckOuts = new HashSet<int>(); // Global hash set to track processing employees
 
         [HttpPost]
-        public async Task<IActionResult> CheckOut(int employeeId, string location)
+        public async Task<IActionResult> CheckOut(int employeeId, string location , string followUpShift)
         {
             if (_processingCheckOuts.Contains(employeeId))
             {
@@ -165,12 +165,13 @@ namespace AMS.Areas.Employee.Controllers
                 }
 
 
-              
+                var FollowUpShift = followUpShift;
 
                 attendance.CheckOutTime = checkOutTime;
                 attendance.CheckOutLat = checkOutLat;
                 attendance.CheckOutLong = checkOutLong;
                 attendance.CheckoutIP = ip;
+                attendance.FollowUpShift = FollowUpShift;
 
                 await _employeeRepository.UpdateAttendanceAsync(attendance);
 

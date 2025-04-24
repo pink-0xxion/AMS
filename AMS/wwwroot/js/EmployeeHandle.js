@@ -48,6 +48,38 @@
 
 
 
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
 
 
@@ -63,10 +95,21 @@ function handleAttendance(action) {
         return;
     }
 
+
     let requestData = { employeeId, action };
     let url = `/Employee/Employee/${action}`;
 
     //if (['CheckIn', 'CheckOut'].includes(action) && navigator.geolocation)
+
+
+    if (action === 'CheckIn' && $('#checkInBtn').text().includes('Re-CheckIn')) {
+        requestData.followUpShift = 'Yes';
+    }
+
+    if (action === 'CheckOut' && $('#checkOutBtn').text().includes('Re-Check-Out')) {
+        requestData.followUpShift = 'No';
+    }
+
 
     if ((action === 'CheckIn' || action === 'CheckOut') && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -96,6 +139,9 @@ function sendAttendanceRequest(url, requestData) {
 
             console.log(`✅ ${requestData.action} successful.`);
             LoadAttendanceDetails(); // Refresh UI
+            setTimeout(() => {
+                updateButtonLabels();
+            }, 500);
             fetchAttendance()
         },
         error: function (xhr) {
@@ -137,11 +183,19 @@ function LoadAttendanceDetails() {
     });
 }
 
+
+
 // ✅ Update Check-In & Check-Out Button Visibility
 function updateButtonVisibility(status) {
     $('#checkInBtn').toggle(status !== "Present");
     $('#checkOutBtn').toggle(status === "Present");
+    
+
+    //Not Available
+
 }
+
+
 
 
 
@@ -313,4 +367,52 @@ function fetchAttendance() {
             $('#instructions').removeClass("d-flex").addClass("d-none");
         }
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+function updateButtonLabels() {
+    const checkInTime = $('#checkInTime').val();
+    const checkOutTime = $('#checkOutTime').val();
+    const followUpShift = $('#followUpShift').val()?.trim();
+
+
+    // Hide both buttons initially
+    $('#checkInBtn').hide();
+    $('#checkOutBtn').hide();
+
+    // 1. No Check-In or Check-Out yet
+    if (checkOutTime === "Not Available" && checkInTime === "Not Available" && followUpShift === "No" ) {
+        $('#checkInBtn').html('✅ Check-In').show();
+    }
+
+    // 2. Checked In, but not yet Checked Out
+    else if (checkOutTime === "Not Available" && checkInTime !== "Not Available" && followUpShift === "No") {
+        $('#checkOutBtn').html('🚪 Check-Out').show();
+    }
+
+    // Case 3: Checked In and Checked Out already (Re-CheckIn & Re-CheckOut)
+    else if (checkInTime !== "Not Available" && checkOutTime !== "Not Available" && followUpShift === "No") {
+        $('#checkInBtn').html('✅ Re-CheckIn').show();
+    }
+
+    else if (checkInTime !== "Not Available" && checkOutTime !== "Not Available" && followUpShift === "Yes") {
+              $('#checkOutBtn').html('🚪 Re-Check-Out').show();
+        
+
+    }
 }
