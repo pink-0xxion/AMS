@@ -28,7 +28,7 @@ public partial class Attendance
     public string Status { get; set; } = null!;
 
 
-    //public string? Remarks { get; set; }
+    public string? Remarks { get; set; }
 
     //public virtual Employees Employee { get; set; } = null!;
 

@@ -175,7 +175,7 @@ namespace AMS.Areas.Employee.Controllers
 
                 await _employeeRepository.UpdateAttendanceAsync(attendance);
 
-                await _employeeRepository.LogCheckOutAsync(attendance.AttendanceID, attendance.CheckInTime, checkOutTime);
+                await _employeeRepository.LogCheckOutAsync(attendance.AttendanceID, attendance.CheckInTime, checkOutTime, attendance.CheckInLat, attendance.CheckInLong, checkOutLat, checkOutLong);
 
                 return Ok(new { message = "Checked out successfully", checkOutTime });
             }

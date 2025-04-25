@@ -45,7 +45,7 @@ namespace AMS.Data
 
 
 
-        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime);
+        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime, double? checkInLat, double? checkInLong, double? checkOutLat, double? checkOutLong);
 
 
 

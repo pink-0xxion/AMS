@@ -63,9 +63,9 @@ namespace AMS.Repository
 
 
 
-        public Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime)
+        public Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime, double? checkInLat, double? checkInLong, double? checkOutLat, double? checkOutLong)
         {
-            return _employeeAttendance.LogCheckOutAsync(attendanceId, checkInTime, checkOutTime);
+            return _employeeAttendance.LogCheckOutAsync(attendanceId, checkInTime, checkOutTime, checkInLat, checkInLong, checkOutLat, checkOutLong);
         }
 
         public Task<IEnumerable<AttendanceLogDto>> GetAttendanceLogsAsync(int employeeId, int year, int month, int day)

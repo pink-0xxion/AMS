@@ -23,7 +23,7 @@ namespace AMS.Interfaces
         Task<EmployeeAttendanceDto?> GetEmployeeAttendanceByDateAsync(int employeeId);
 
 
-        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime);
+        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime, double? checkInLat, double? checkInLong, double? checkOutLat, double? checkOutLong);
 
 
 

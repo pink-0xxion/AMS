@@ -188,23 +188,36 @@ namespace AMS.Data
 
 
 
-        public async Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime)
+        public async Task LogCheckOutAsync(
+                      int attendanceId,
+                      TimeSpan checkInTime,
+                      TimeSpan checkOutTime,
+                      double? checkInLat,
+                      double? checkInLong,
+                      double? checkOutLat,
+                      double? checkOutLong)
+                        {
+                            using var connection = _context.CreateConnection();
+                            await connection.OpenAsync();
 
-        {
-            using var connection = _context.CreateConnection();
-            await connection.OpenAsync();
+                            var query = @"
+                        INSERT INTO AttendanceLogs 
+                        (AttendanceID, CheckInTime, CheckOutTime, CheckInLat, CheckInLong, CheckOutLat, CheckOutLong, LogDateTime)
+                        VALUES 
+                        (@AttendanceID, @CheckInTime, @CheckOutTime, @CheckInLat, @CheckInLong, @CheckOutLat, @CheckOutLong, GETDATE())";
 
-            var query = @"
-        INSERT INTO AttendanceLogs (AttendanceID, CheckInTime, CheckOutTime, LogDateTime)
-        VALUES (@AttendanceID, @CheckInTime, @CheckOutTime, GETDATE())";
+                            await connection.ExecuteAsync(query, new
+                            {
+                                AttendanceID = attendanceId,
+                                CheckInTime = checkInTime,
+                                CheckOutTime = checkOutTime,
+                                CheckInLat = checkInLat,
+                                CheckInLong = checkInLong,
+                                CheckOutLat = checkOutLat,
+                                CheckOutLong = checkOutLong
+                            });
+                        }
 
-            await connection.ExecuteAsync(query, new
-            {
-                AttendanceID = attendanceId,
-                CheckInTime = checkInTime,
-                CheckOutTime = checkOutTime
-            });
-        }
 
 
 

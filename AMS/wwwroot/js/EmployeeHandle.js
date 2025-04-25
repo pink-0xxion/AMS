@@ -24,6 +24,13 @@
 
     LoadAttendanceDetails(); // Load attendance on page load
 
+
+    //updateButtonLabels();
+    setTimeout(function () {
+        updateButtonLabels();
+    }, 200);
+
+
     $('#checkInBtn').off('click').on('click', () => handleAttendance('CheckIn'));
     $('#checkOutBtn').off('click').on('click', () => handleAttendance('CheckOut'));
     $('#logoutBtn').off('click').on('click', handleLogout);
