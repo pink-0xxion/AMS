@@ -19,12 +19,38 @@ namespace AMS.Data
             _tableName = typeof(T).Name; // Assumes table name = class name
         }
 
+        //public async Task<IEnumerable<T>> GetAllAsync()
+        //{
+        //    var query = $"SELECT * FROM {_tableName}";
+        //    using var connection = _context.CreateConnection();
+        //    return await connection.QueryAsync<T>(query);
+        //}
+
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            var query = $"SELECT * FROM {_tableName}";
+            var query = $"SELECT * FROM {_tableName} WHERE IsDelete = 0";
             using var connection = _context.CreateConnection();
+
             return await connection.QueryAsync<T>(query);
+
+            //var result = await connection.QueryAsync<T>(query);
+
+            //// Log each object in the result
+            //foreach (var item in result)
+            //{
+            //    Console.WriteLine($"Returned object: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
+            //}
+
+            //return result;
+        
+
+
         }
+
+
+
+
+
 
         public async Task<T> GetByIdAsync(string idColumn, int id)
         {
@@ -68,12 +94,31 @@ namespace AMS.Data
             return await connection.ExecuteAsync(query, entity);
         }
 
+
+        //public async Task<int> DeleteAsync(string idColumn, int id)
+        //{
+        //    var query = $"DELETE FROM {_tableName} WHERE {idColumn} = @Id";
+        //    using var connection = _context.CreateConnection();
+        //    return await connection.ExecuteAsync(query, new { Id = id });
+        //}
+
+
         public async Task<int> DeleteAsync(string idColumn, int id)
         {
-            var query = $"DELETE FROM {_tableName} WHERE {idColumn} = @Id";
+            var query = $"UPDATE {_tableName} SET IsDelete = 1 WHERE {idColumn} = @Id";
             using var connection = _context.CreateConnection();
             return await connection.ExecuteAsync(query, new { Id = id });
         }
+        //show hidden deactivate employee
+        public async Task<IEnumerable<T>> GetAllDeletedAsync()
+        {
+            var query = $"SELECT * FROM {_tableName} WHERE IsDelete = 1";
+            using var connection = _context.CreateConnection();
+            return await connection.QueryAsync<T>(query);
+        }
+
+
+
 
         // ✅ method: Login query using username and password columns
         public async Task<T> GetByCredentialsAsync(string usernameColumn, string passwordColumn, string username, string password)
@@ -84,14 +129,67 @@ namespace AMS.Data
         }
 
         // ✅ New method: Login query using username and password columns
-        public async Task<T> GetByUserCredentialsAsync(string usernameColumn, string passwordColumn, string roleColumn, string username, string password, string role)
-        {
-            Console.WriteLine("GetByUserCredentialsAsync Called");
+        //public async Task<T> GetByUserCredentialsAsync(string usernameColumn, string passwordColumn, string roleColumn, string username, string password, string role)
+        //{
+        //    Console.WriteLine("GetByUserCredentialsAsync Called");
 
-            var query = $"SELECT * FROM [{_tableName}] WHERE {usernameColumn} = @Username AND {passwordColumn} = @Password AND {roleColumn} = @Role";
+        //    var query = $"SELECT * FROM [{_tableName}] WHERE {usernameColumn} = @Username AND {passwordColumn} = @Password AND {roleColumn} = @Role";
+        //    using var connection = _context.CreateConnection();
+        //    return await connection.QuerySingleOrDefaultAsync<T>(query, new { Username = username, Password = password, Role = role });
+        //}
+
+   
+
+
+
+        public async Task<(T? user, bool isDeactivated)> GetByUserCredentialsAsync<T>(
+                string usernameColumn, string passwordColumn, string roleColumn,
+                string username, string password, string role) where T : class
+        {
             using var connection = _context.CreateConnection();
-            return await connection.QuerySingleOrDefaultAsync<T>(query, new { Username = username, Password = password, Role = role });
+
+            // Single query to get both user and status
+            var query = $@"
+            SELECT U.*, E.Status
+            FROM [{_tableName}] U
+            JOIN Employees E ON U.EmployeeID = E.EmployeeID
+            WHERE U.{usernameColumn} = @Username
+              AND U.{passwordColumn} = @Password
+              AND U.{roleColumn} = @Role";
+
+            // Use QueryAsync to get both user data and status in one trip to the database
+            var result = await connection.QueryAsync<T, string, (T user, string status)>(
+                query,
+                (user, status) => (user, status),
+                new
+                {
+                    Username = username,
+                    Password = password,
+                    Role = role
+                },
+                splitOn: "Status"
+            );
+
+            var userResult = result.FirstOrDefault();
+
+            // No matching user found
+            if (userResult.user == null)
+            {
+                return (null, false);
+            }
+
+            // Check if user is inactive
+            bool isDeactivated = !string.IsNullOrEmpty(userResult.status) &&
+                                  userResult.status.Trim().Equals("Inactive", StringComparison.OrdinalIgnoreCase);
+
+            // Return null if deactivated, otherwise return the user
+            return isDeactivated ? (null, true) : (userResult.user, false);
         }
+
+
+
+
+
 
         // ✅ New method: Get attendance records optionally filtered by employee
         public async Task<IEnumerable<dynamic>> GetAttendanceByMonthYearAsync(int employee, int month, int year)
@@ -99,19 +197,21 @@ namespace AMS.Data
             using var connection = _context.CreateConnection();
 
             string query = @"SELECT 
-                                AttendanceDate,
-                                CheckInTime,
-                                CheckOutTime,
-                                Status,
-                                Remarks,
-                                EmployeeID
-                            FROM Attendance
-                            WHERE MONTH(AttendanceDate) = @Month
-                              AND YEAR(AttendanceDate) = @Year";
+                        Attendance.AttendanceDate,
+                        Attendance.CheckInTime,
+                        Attendance.CheckOutTime,
+                        Attendance.Status,
+                        Attendance.Remarks,
+                        Attendance.EmployeeID
+                    FROM Attendance
+                    INNER JOIN Employees ON Attendance.EmployeeID = Employees.EmployeeID
+                    WHERE MONTH(Attendance.AttendanceDate) = @Month
+                      AND YEAR(Attendance.AttendanceDate) = @Year
+                      AND Employees.IsDelete = 0"; // Filter on Employees.IsDelete
 
             if (employee != 0)
             {
-                query += " AND EmployeeID = @EmployeeID";
+                query += " AND Attendance.EmployeeID = @EmployeeID";
             }
 
             return await connection.QueryAsync(query, new
@@ -335,14 +435,14 @@ namespace AMS.Data
 
 
             string query = @"
-SELECT 
-    COALESCE(CONVERT(VARCHAR, al.LogDateTime, 120), 'Not Available') AS LogDateTime,
-    COALESCE(CONVERT(VARCHAR, al.CheckInTime, 108), 'Not Available') AS CheckInTime, 
-    COALESCE(CONVERT(VARCHAR, al.CheckOutTime, 108), 'Not Available') AS CheckOutTime
-FROM AttendanceLogs al
-INNER JOIN Attendance a ON a.AttendanceID = al.AttendanceID
-WHERE a.EmployeeID = @EmployeeID AND CAST(al.LogDateTime AS DATE) = @TargetDate
-ORDER BY al.LogDateTime DESC;";
+            SELECT 
+                COALESCE(CONVERT(VARCHAR, al.LogDateTime, 120), 'Not Available') AS LogDateTime,
+                COALESCE(CONVERT(VARCHAR, al.CheckInTime, 108), 'Not Available') AS CheckInTime, 
+                COALESCE(CONVERT(VARCHAR, al.CheckOutTime, 108), 'Not Available') AS CheckOutTime
+            FROM AttendanceLogs al
+            INNER JOIN Attendance a ON a.AttendanceID = al.AttendanceID
+            WHERE a.EmployeeID = @EmployeeID AND CAST(al.LogDateTime AS DATE) = @TargetDate
+            ORDER BY al.LogDateTime DESC;";
 
 
             return await connection.QueryAsync<AttendanceLogDto>(query, new
@@ -382,8 +482,12 @@ ORDER BY al.LogDateTime DESC;";
             return result;
         }
 
-
-
-
+     
     }
+
+
+
+
+
+
 }

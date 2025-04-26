@@ -23,16 +23,27 @@ namespace AMS.Repository
         }
 
         // ✅ Implement login method
-        public Task<Admin> GetByCredentialsAsync(string usernameColumn, string passwordColumn, string username, string password)
-        {
-            return _adminGenRepository.GetByCredentialsAsync(usernameColumn, passwordColumn, username, password);
-        }
+        //public Task<Admin> GetByCredentialsAsync(string usernameColumn, string passwordColumn, string username, string password)
+        //{
+        //    return _adminGenRepository.GetByCredentialsAsync(usernameColumn, passwordColumn, username, password);
+        //}
 
         // ✅ New Implement login method
-        Task<User> IAdminRepository.GetByUserCredentialsAsync(string usernameColumn, string passwordColumn, string roleColumn, string username, string password, string role)
-        {
-            return _user.GetByUserCredentialsAsync(usernameColumn, passwordColumn, roleColumn, username, password, role);
-        }
+        //Task<User> IAdminRepository.GetByUserCredentialsAsync(string usernameColumn, string passwordColumn, string roleColumn, string username, string password, string role)
+        //{
+        //    return _user.GetByUserCredentialsAsync(usernameColumn, passwordColumn, roleColumn, username, password, role);
+        //}
+
+   
+        public Task<(User? user, bool isDeactivated)> GetByUserCredentialsAsync(
+            string usernameColumn, string passwordColumn, string roleColumn,
+            string username, string password, string role)
+                {
+                    return _user.GetByUserCredentialsAsync<User>(usernameColumn, passwordColumn, roleColumn, username, password, role);
+                }
+
+
+
 
         // Get All Employees
         Task<IEnumerable<Employees>> IAdminRepository.GetAllAsync()

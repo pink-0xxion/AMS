@@ -1,47 +1,29 @@
 ﻿$(document).ready(() => {
     //alert("Hello!");
+
+
     GetEmployees();
 
-    // Show default table when page loads
-    //setTimeout(() => {
-    //    fetchAttendance();
-    //}, 200); // Delay to ensure GetEmployees has populated the dropdown
+   
+    const today = new Date();
+    $('select[name="month"]').val(today.getMonth() + 1);
+    $('select[name="year"]').val(today.getFullYear());
+   
 
-    // Safe as it only runs when form already rendered, placing of <script> doesn't matter
     $('#attendanceForm').on('submit', function (e) {
-        e.preventDefault(); // prevent form default postback
 
-        const employeeId = $('#employee').val();
-        const month = $('select[name="month"]').val();
-        const year = $('select[name="year"]').val();
-
-        if (!employeeId || !month || !year) {
-            alert("Please select employee, month, and year.");
-            return;
-        }
-
+        e.preventDefault();
         fetchAttendance();
-
-
     });
+
 })
 
 
-// Write outside, if DOM or Html form element already rendered, place it in bottom near </body>
-//$('#attendanceForm').on('submit', function (e) {
-//    e.preventDefault(); // prevent form default postback
 
-//    const employeeId = $('#employee').val();
-//    const month = $('select[name="month"]').val();
-//    const year = $('select[name="year"]').val();
 
-//    if (!employeeId || !month || !year) {
-//        alert("Please select employee, month, and year.");
-//        return;
-//    }
 
-//    fetchAttendance();
-//});
+
+
 
 function GetEmployees() {
     console.log("GetEmployees is running");
@@ -50,18 +32,23 @@ function GetEmployees() {
         url: '/Attendance/GetEmployees',
         method: 'GET',
         success: function (result) {
-            // Add "All Employees" option first
-            $('#employee').append('<option value="0">All Employees</option>');
+            var $employeeSelect = $('#employee');
 
-            // Then loop through actual employees
+            $employeeSelect.empty(); // <--- FIRST: clear any old options
+
+            // Add "All Employees" option first
+            $employeeSelect.append('<option value="0">All Employees</option>');
+
+            // Then add real employees
             $.each(result, function (i, data) {
-                $('#employee').append('<option value="' + data.id + '">' + data.name + '</option>');
+                $employeeSelect.append('<option value="' + data.id + '">' + data.name + '</option>');
             });
 
-            fetchAttendance();
+            $employeeSelect.val(0).trigger('change'); // <--- Then select default value and trigger change
 
-
-        },
+            fetchAttendance(); // <--- Then call fetchAttendance
+        }
+,
         error: function (xhr, status, error) {
             console.error("Error fetching employees:", error);
         }
@@ -69,46 +56,23 @@ function GetEmployees() {
 
 }
 
+
+
+
+
+
 function fetchAttendance() {
     console.log("fetchAttendance is called");
 
 
-    //const employeeId = $('#employee').val();
-    //const month = $('select[name="month"]').val();
-    //const year = $('select[name="year"]').val();
-
-    // Get current month and year
-
-
     const today = new Date();
 
-
-    //const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
-    //const currentYear = today.getFullYear();
-
-    // default fallback
-    //const employeeId = $('#employee').val() ? $('#employee').val() : 0;
-    //const month = $('select[name="month"]').val() ? $('select[name="month"]').val() : currentMonth;
-    //const year = $('select[name="year"]').val() ? $('select[name="year"]').val() : currentYear;
 
 
     const month = $('select[name="month"]').val() || today.getMonth() + 1;
     const year = $('select[name="year"]').val() || today.getFullYear();
     const employeeId = $("#employee").val() || 0; // Using the employeeId from Razor
 
-
-
-
-
-    //console.log("employeeId: ", employeeId);
-    //console.log("month: ", month);
-    //console.log("year: ", year);
-
-
-    //if (!employeeId || !month || !year) {
-    //    alert("Please select employee, month, and year.");
-    //    return;
-    //}
 
 
     $.ajax({

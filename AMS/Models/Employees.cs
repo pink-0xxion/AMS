@@ -23,6 +23,12 @@ public partial class Employees
 
     public string Status { get; set; } = null!;
 
+    public string Project { get; set; } = "Not Assigned";
+
+    public bool IsDelete { get; set; }
+
+
+
     //public virtual ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
     //public virtual ICollection<LeaveRequest> LeaveRequests { get; set; } = new List<LeaveRequest>();

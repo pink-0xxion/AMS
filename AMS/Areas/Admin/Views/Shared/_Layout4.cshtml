@@ -69,11 +69,17 @@
 				<partial name="~/Areas/Admin/Views/Shared/_Header.cshtml" />
 
 				<!-- Body Content -->
-				<main class="pb-3 p-3 mt-5 ms-5" role="main">
-					<div class="container mt-3 ml-3">
-						@RenderBody()
+				<div class="row">
+					<div class="col-1"></div>
+					<div class="col-11">
+						<main class="pb-3 p-3 mt-5 ms-5" role="main">
+							<div class="container mt-3 ml-3">
+								@RenderBody()
+							</div>
+						</main>
 					</div>
-				</main>
+				</div>
+				
 
 				<!-- Switcher and Footer -->
 				<partial name="~/Areas/Admin/Views/Shared/_Switcher.cshtml" />
