@@ -1,6 +1,7 @@
 ﻿using AMS.Interfaces;
 using AMS.Models;
 using AMS.Data;
+using AMS.Models.ViewModel;
 
 namespace AMS.Repository
 {
@@ -54,17 +55,17 @@ namespace AMS.Repository
         //    return await _employeeAttendance.AddAttendanceAsync(attendance);
         //}
 
-        public Task<bool> CheckInAsync(int employeeId, string remarks)
+        public Task<bool> CheckInAsync(int employeeId, string ip, double? checkInLat, double? checkInLong, string followUpShift)
         {
-         return _employeeAttendance.CheckInAsync(employeeId, remarks);
+         return _employeeAttendance.CheckInAsync(employeeId,ip, checkInLat, checkInLong, followUpShift);
         }
 
 
 
 
-        public Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime)
+        public Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime, double? checkInLat, double? checkInLong, double? checkOutLat, double? checkOutLong)
         {
-            return _employeeAttendance.LogCheckOutAsync(attendanceId, checkInTime, checkOutTime);
+            return _employeeAttendance.LogCheckOutAsync(attendanceId, checkInTime, checkOutTime, checkInLat, checkInLong, checkOutLat, checkOutLong);
         }
 
         public Task<IEnumerable<AttendanceLogDto>> GetAttendanceLogsAsync(int employeeId, int year, int month, int day)

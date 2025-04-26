@@ -38,7 +38,9 @@ namespace AMS.Areas.Admin.Controllers
             }
 
             var employee = await _adminRepository.GetAllAsync();
+
             return View(employee);
+
         }
 
         //------------------------------------OLD LOGIN-----------------------------------------------//
@@ -83,10 +85,69 @@ namespace AMS.Areas.Admin.Controllers
 
 
 
+        //[HttpPost]
+        //public async Task<IActionResult> Login(User user)
+        //{
+        //    Console.WriteLine(user.Username);
+        //    Console.WriteLine(user.PasswordHash);
+        //    // Replace these with your actual column names from the database
+        //    string usernameColumn = "Username";
+        //    string passwordColumn = "PasswordHash";
+        //    string roleColumn = "Role";
+
+        //    //var (myAdmin, isDeactivated) = await _adminRepository.GetByUserCredentialsAsync(usernameColumn, passwordColumn, roleColumn, user.Username, user.PasswordHash, user.Role);
+
+        //        var (myAdmin, isDeactivated) =  await _adminRepository.GetByUserCredentialsAsync(
+        //    "Username", "PasswordHash", "Role", user.Username, user.PasswordHash, user.Role);
+
+
+        //    Console.WriteLine("show it: " + JsonSerializer.Serialize(myAdmin));
+
+        //    if (myAdmin != null)
+        //    {
+        //        if (myAdmin.Role == "Admin" || myAdmin.Role == "admin")
+        //        {
+        //            HttpContext.Session.SetString("UserSession", myAdmin.Username);
+        //            //HttpContext.Session.SetString("UserImage", myAdmin.Image ?? "default-profile.jpg");
+        //            return RedirectToAction("Index", "Attendance", new { area = ""});
+        //        }
+        //        else if (myAdmin.Role == "Employee" || myAdmin.Role == "employee")
+        //        {
+        //            HttpContext.Session.SetInt32("EmployeeId", myAdmin.EmployeeId.Value);
+        //            //HttpContext.Session.SetString("UserImage", myAdmin.Image ?? "default-profile.jpg");
+        //            return RedirectToAction("Index", "Employee", new { area = "Employee" });
+        //        }
+        //        else
+        //        {
+        //            TempData["Error"] = "Login Failed...";
+        //        }
+        //    }
+        //    else
+        //    {
+        //        TempData["Error"] = "Login Failed...";
+        //    }
+
+        //    return RedirectToAction("Index", "Home", new { area = "" });
+        //}
+
+        //public IActionResult Create()
+        //{
+        //    var email = HttpContext.Session.GetString("UserSession");
+
+        //    if (string.IsNullOrEmpty(email))
+        //    {
+        //        return RedirectToAction("Index", "Home", new { area = "" });
+        //    }
+
+        //    return View();
+        //}
+
+
+
+
         [HttpPost]
         public async Task<IActionResult> Login(User user)
         {
-            Console.WriteLine("joker");
             Console.WriteLine(user.Username);
             Console.WriteLine(user.PasswordHash);
             // Replace these with your actual column names from the database
@@ -94,22 +155,26 @@ namespace AMS.Areas.Admin.Controllers
             string passwordColumn = "PasswordHash";
             string roleColumn = "Role";
 
-            var myAdmin = await _adminRepository.GetByUserCredentialsAsync(usernameColumn, passwordColumn, roleColumn, user.Username, user.PasswordHash, user.Role);
+            var (myAdmin, isDeactivated) = await _adminRepository.GetByUserCredentialsAsync(
+                usernameColumn, passwordColumn, roleColumn, user.Username, user.PasswordHash, user.Role
+            );
 
             Console.WriteLine("show it: " + JsonSerializer.Serialize(myAdmin));
 
+          
+
             if (myAdmin != null)
             {
+                
+
                 if (myAdmin.Role == "Admin" || myAdmin.Role == "admin")
                 {
                     HttpContext.Session.SetString("UserSession", myAdmin.Username);
-                    //HttpContext.Session.SetString("UserImage", myAdmin.Image ?? "default-profile.jpg");
-                    return RedirectToAction("Index", "Attendance", new { area = ""});
+                    return RedirectToAction("Index", "Attendance", new { area = "" });
                 }
                 else if (myAdmin.Role == "Employee" || myAdmin.Role == "employee")
                 {
                     HttpContext.Session.SetInt32("EmployeeId", myAdmin.EmployeeId.Value);
-                    //HttpContext.Session.SetString("UserImage", myAdmin.Image ?? "default-profile.jpg");
                     return RedirectToAction("Index", "Employee", new { area = "Employee" });
                 }
                 else
@@ -119,11 +184,22 @@ namespace AMS.Areas.Admin.Controllers
             }
             else
             {
-                TempData["Error"] = "Login Failed...";
+                
+                if (isDeactivated) // Check if user is deactivated
+                {
+                    TempData["Error"] = "Your account is deactivated. Please contact the administrator.";
+                    return RedirectToAction("Index", "Home", new { area = "" });
+                }
+                else { TempData["Error"] = "Login Failed..."; }
             }
 
             return RedirectToAction("Index", "Home", new { area = "" });
         }
+
+
+
+
+
 
         public IActionResult Create()
         {
@@ -137,8 +213,10 @@ namespace AMS.Areas.Admin.Controllers
             return View();
         }
 
+
+
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("FirstName, LastName, Email, PhoneNumber, Department, Designation, JoiningDate, Status")] Employees employee)
+        public async Task<IActionResult> Create([Bind("FirstName, LastName, Email, PhoneNumber, Department, Designation, JoiningDate, Status,Project")] Employees employee)
         {
             Console.WriteLine("Create Post called");
             var email = HttpContext.Session.GetString("UserSession");
@@ -209,7 +287,7 @@ namespace AMS.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit([Bind("EmployeeId, FirstName, LastName, Email, PhoneNumber, Department, Designation, JoiningDate, Status")] Employees employee)
+        public async Task<IActionResult> Edit([Bind("EmployeeId, FirstName, LastName, Email, PhoneNumber, Department, Designation, JoiningDate, Status,Project")] Employees employee)
         {
             var email = HttpContext.Session.GetString("UserSession"); // Use logged-in user's email
 
@@ -318,6 +396,9 @@ namespace AMS.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+
+
+
         public async Task<IActionResult> EmployeeDetails(int id)
         {
             var email = HttpContext.Session.GetString("UserSession");
@@ -395,7 +476,20 @@ namespace AMS.Areas.Admin.Controllers
             var document = new EmployeeDetailsDocument(model);
             var pdfBytes = document.GeneratePdf();
 
-            return File(pdfBytes, "application/pdf", "EmployeeDetails_QuestPDF.pdf");
+            // Format filename: AnkitApril25
+            var monthName = DateTime.Now.ToString("MMMM");
+            var yearTwoDigit = DateTime.Now.ToString("yy");
+            var firstName = employee?.FirstName?.Replace(" ", "") ?? "Employee";
+            var lastName = employee?.LastName?.Replace(" ", "") ?? "";
+
+            var fullName = $"{firstName}{lastName}";
+            var fileName = $"{fullName}{monthName}{yearTwoDigit}.pdf";
+
+            return File(pdfBytes, "application/pdf", fileName);
+
+
+
+
         }
 
         public IActionResult Logout()

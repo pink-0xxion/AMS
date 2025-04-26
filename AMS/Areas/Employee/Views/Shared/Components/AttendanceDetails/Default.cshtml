@@ -1,9 +1,11 @@
-﻿@model AMS.Models.EmployeeAttendanceDto
+﻿@using AMS.Models.ViewModel
+@model EmployeeAttendanceDto
 
 <div class="container mt-4">
     <div class="card shadow-lg border-0 rounded-3">
-        <div class="card-header bg-primary text-white text-center">
+        <div class="card-header bg-primary text-white text-center d-flex justify-content-between align-items-center">
             <h5 class="mb-0">My Attendance Details</h5>
+            <span id="liveClock" class="fs-5 fw-semibold"></span>
         </div>
         <div class="card-body">
             <div class="row">
@@ -20,35 +22,89 @@
                         <span class="badge @(Model.Status == "Present" ? "bg-success" : "bg-danger")">@Model.Status</span>
                     </p>
                     <input type="hidden" id="attendanceStatus" value="@Model.Status" />
+                    <input type="hidden" id="checkOutTime" value="@Model.CheckOutTime" />
+                    <input type="hidden" id="checkInTime" value="@Model.CheckInTime" />
+                    <input type="hidden" id="followUpShift" value="@Model.FollowUpShift" />
+
                 </div>
             </div>
 
             <hr />
-            <p><strong>Remarks:</strong></p>
 
-            @if (!string.IsNullOrEmpty(Model.Remarks) && Model.Remarks.Contains("Lat:") && Model.Remarks.Contains("Long:"))
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Check-In Location:</strong></p>
+                    @if (Model.CheckInLat.HasValue && Model.CheckInLong.HasValue)
+                    {
+                        var lat = Model.CheckInLat.Value;
+                        var lng = Model.CheckInLong.Value;
+
+                        <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
+                            📍 View Location
+                        </button>
+                    }
+                    else
+                    {
+                        <span>Location not available</span>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Check-Out Location:</strong></p>
+                    @if (Model.CheckOutLat.HasValue && Model.CheckOutLong.HasValue)
+                    {
+                        var lat = Model.CheckOutLat.Value;
+                        var lng = Model.CheckOutLong.Value;
+
+                        <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
+                            📍 View Location
+                        </button>
+                    }
+                    else
+                    {
+                        <span>Location not available</span>
+                    }
+                </div>
+            </div>
+
+
+
+
+         @*    <p><strong>Check-In Location:</strong></p>
+
+            @if (Model.CheckInLat.HasValue && Model.CheckInLong.HasValue)
             {
-                var latStart = Model.Remarks.IndexOf("Lat:") + 4;
-                var longStart = Model.Remarks.IndexOf("Long:") + 6;
+                var lat = Model.CheckInLat.Value;
+                var lng = Model.CheckInLong.Value;
 
-                if (latStart > 3 && longStart > 5) // Ensure valid positions
-                {
-                    var lat = Model.Remarks.Substring(latStart, Model.Remarks.IndexOf(",", latStart) - latStart).Trim();
-                    var lng = Model.Remarks.Substring(longStart).Trim();
-
-                    <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
-                        📍 View Location
-                    </button>
-                }
-                else
-                {
-                    <span>@Model.Remarks</span>
-                }
+                <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
+                    📍 View Location
+                </button>
             }
             else
             {
-                <span>No remarks</span>
+                <span>Location not available</span>
             }
+
+
+
+            <p><strong>Check-Out Location:</strong></p>
+
+            @if (Model.CheckOutLat.HasValue && Model.CheckOutLong.HasValue)
+            {
+                var lat = Model.CheckOutLat.Value;
+                var lng = Model.CheckOutLong.Value;
+
+                <button class="btn btn-info view-location-btn" data-lat="@lat" data-lng="@lng">
+                    📍 View Location
+                </button>
+            }
+            else
+            {
+                <span>Location not available</span>
+            } *@
+
+
         </div>
     </div>
 </div>

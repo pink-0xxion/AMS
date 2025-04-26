@@ -1,4 +1,5 @@
-﻿@model AMS.Models.EmployeeAttendanceViewModel
+﻿@using AMS.Models.ViewModel
+@model EmployeeAttendanceViewModel
 
 
 @{
@@ -83,6 +84,7 @@
                             <th>Log Date & Time</th>
                             <th>Check-In Time</th>
                             <th>Check-Out Time</th>
+                            <th>Work Hours</th>
                         </tr>
                     </thead>
 
@@ -100,7 +102,10 @@
                     <tbody id="attendanceLogTableBody">
 
                         <partial name="_AttendanceLogRows" model="Model.AttendanceLogs" />
+
+
                     </tbody>
+
 
 
 
@@ -120,6 +125,7 @@
 @section Scripts {
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/EmployeeHandle.js"></script>
+    <script src="~/js/Clock.js"></script>
 }
 
 

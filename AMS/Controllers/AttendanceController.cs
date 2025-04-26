@@ -28,6 +28,10 @@ namespace AMS.Controllers
             }
 
             var employee = await _adminRepository.GetAllAsync();
+
+            Console.WriteLine("show it: " +employee);
+
+
             int totalEmployees = employee.Count();
 
             string idColumn = "AttendanceDate";

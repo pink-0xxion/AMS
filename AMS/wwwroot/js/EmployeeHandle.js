@@ -18,9 +18,18 @@
         e.preventDefault();
         fetchAttendance();
     });
+
+
     //----------------------------------------------------
 
     LoadAttendanceDetails(); // Load attendance on page load
+
+
+    //updateButtonLabels();
+    setTimeout(function () {
+        updateButtonLabels();
+    }, 200);
+
 
     $('#checkInBtn').off('click').on('click', () => handleAttendance('CheckIn'));
     $('#checkOutBtn').off('click').on('click', () => handleAttendance('CheckOut'));
@@ -37,12 +46,52 @@
         $("#mapModal").modal('show');
     });
 
+
     // Ensure iframe is cleared when modal closes
     $("#mapModal").on("hidden.bs.modal", function () {
         $(this).attr('aria-hidden', 'true'); // Restore when closed
         $("#mapIframe").attr("src", "");
     });
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
+
+
+
+
 
 // ✅ Unified Function for Handling Check-In & Check-Out
 function handleAttendance(action) {
@@ -53,13 +102,27 @@ function handleAttendance(action) {
         return;
     }
 
+
     let requestData = { employeeId, action };
     let url = `/Employee/Employee/${action}`;
 
-    if (action === 'CheckIn' && navigator.geolocation) {
+    //if (['CheckIn', 'CheckOut'].includes(action) && navigator.geolocation)
+
+
+    if (action === 'CheckIn' && $('#checkInBtn').text().includes('Re-CheckIn')) {
+        requestData.followUpShift = 'Yes';
+    }
+
+    if (action === 'CheckOut' && $('#checkOutBtn').text().includes('Re-Check-Out')) {
+        requestData.followUpShift = 'No';
+    }
+
+
+    if ((action === 'CheckIn' || action === 'CheckOut') && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                requestData.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
+                //requestData.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
+                requestData.location = `${position.coords.latitude},${position.coords.longitude}`;
                 sendAttendanceRequest(url, requestData);
             },
             (error) => {
@@ -83,6 +146,9 @@ function sendAttendanceRequest(url, requestData) {
 
             console.log(`✅ ${requestData.action} successful.`);
             LoadAttendanceDetails(); // Refresh UI
+            setTimeout(() => {
+                updateButtonLabels();
+            }, 500);
             fetchAttendance()
         },
         error: function (xhr) {
@@ -124,11 +190,19 @@ function LoadAttendanceDetails() {
     });
 }
 
+
+
 // ✅ Update Check-In & Check-Out Button Visibility
 function updateButtonVisibility(status) {
     $('#checkInBtn').toggle(status !== "Present");
     $('#checkOutBtn').toggle(status === "Present");
+    
+
+    //Not Available
+
 }
+
+
 
 
 
@@ -183,6 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
     logDay.addEventListener('change', loadAttendanceLogs);
 });
 
+
+
+
+
 // Fetch Attendance Data
 function fetchAttendance() {
     console.log("fetchAttendance called");
@@ -193,9 +271,9 @@ function fetchAttendance() {
     const employeeId = $("#employee").val(); // Using the employeeId from Razor
 
 
-    console.log(month);
-    console.log(year);
-    console.log(employeeId);
+    //console.log(month);
+    //console.log(year);
+    //console.log(employeeId);
 
     $.ajax({
         url: '/Employee/Employee/GetEmployeeAttendanceById',
@@ -205,10 +283,17 @@ function fetchAttendance() {
             month: month,
             year: year
         },
+       
+     
+
+
 
         success: function (data) {
+            
+            //console.log(`${data}`);
 
-            //console.log("Fetched Data: " + data);
+            //console.logFetched Data: " + data);
+
             //console.log("Fetched Data: " + JSON.stringify(data, null, 2));
 
             const tableHead = $('#attendanceHead');
@@ -289,4 +374,52 @@ function fetchAttendance() {
             $('#instructions').removeClass("d-flex").addClass("d-none");
         }
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+function updateButtonLabels() {
+    const checkInTime = $('#checkInTime').val();
+    const checkOutTime = $('#checkOutTime').val();
+    const followUpShift = $('#followUpShift').val()?.trim();
+
+
+    // Hide both buttons initially
+    $('#checkInBtn').hide();
+    $('#checkOutBtn').hide();
+
+    // 1. No Check-In or Check-Out yet
+    if (checkOutTime === "Not Available" && checkInTime === "Not Available" && followUpShift === "No" ) {
+        $('#checkInBtn').html('✅ Check-In').show();
+    }
+
+    // 2. Checked In, but not yet Checked Out
+    else if (checkOutTime === "Not Available" && checkInTime !== "Not Available" && followUpShift === "No") {
+        $('#checkOutBtn').html('🚪 Check-Out').show();
+    }
+
+    // Case 3: Checked In and Checked Out already (Re-CheckIn & Re-CheckOut)
+    else if (checkInTime !== "Not Available" && checkOutTime !== "Not Available" && followUpShift === "No") {
+        $('#checkInBtn').html('✅ Re-CheckIn').show();
+    }
+
+    else if (checkInTime !== "Not Available" && checkOutTime !== "Not Available" && followUpShift === "Yes") {
+              $('#checkOutBtn').html('🚪 Re-Check-Out').show();
+        
+
+    }
 }

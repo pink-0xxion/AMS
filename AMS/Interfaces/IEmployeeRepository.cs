@@ -1,11 +1,12 @@
 ﻿using AMS.Models;
+using AMS.Models.ViewModel;
 
 namespace AMS.Interfaces
 {
     public interface IEmployeeRepository
     {
 
-        Task<bool> CheckInAsync(int employeeId, string remarks);
+        Task<bool> CheckInAsync(int employeeId, string ip, double? checkInLat, double? checkInLong, string followUpShift);
 
 
         //not in use 
@@ -22,7 +23,7 @@ namespace AMS.Interfaces
         Task<EmployeeAttendanceDto?> GetEmployeeAttendanceByDateAsync(int employeeId);
 
 
-        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime);
+        Task LogCheckOutAsync(int attendanceId, TimeSpan checkInTime, TimeSpan checkOutTime, double? checkInLat, double? checkInLong, double? checkOutLat, double? checkOutLong);
 
 
 

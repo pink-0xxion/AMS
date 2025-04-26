@@ -51,6 +51,13 @@
                             <span asp-validation-for="JoiningDate" class="text-danger small"></span>
                         </div>
 
+
+                        <div class="mb-3">
+                            <label asp-for="Project" class="form-label"></label>
+                            <input asp-for="Project" class="form-control" placeholder="Enter Project Name" />
+                            <span asp-validation-for="Project" class="text-danger small"></span>
+                        </div>
+
                         <div class="mb-4">
                             <label asp-for="Status" class="form-label"></label>
                             <select asp-for="Status" class="form-select"
